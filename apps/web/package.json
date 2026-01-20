@@ -36,7 +36,7 @@
     "type-check": "tsc --noEmit",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test"
   }

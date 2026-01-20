@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { apiClient, handleApiError } from '../../lib/api';
+import { handleApiError } from '../../lib/api';
 import Loading from '../../components/Loading';
 
 interface ResultData {

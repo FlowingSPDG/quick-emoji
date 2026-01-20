@@ -13,12 +13,12 @@ export default function LeaderboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | 'all'>('all');
 
-  const loadLeaderboard = async (platform?: Platform) => {
+  const loadLeaderboard = async (platform?: Platform | 'all') => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await apiClient.leaderboard.getLeaderboard(50, platform === 'all' ? undefined : platform);
+      const response = await apiClient.leaderboard.getLeaderboard(50, platform && platform !== 'all' ? platform : undefined);
       setLeaderboard(response.leaderboard);
     } catch (err) {
       setError(handleApiError(err));

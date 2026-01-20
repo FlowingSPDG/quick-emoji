@@ -6,7 +6,6 @@ import Link from 'next/link';
 import type { Platform, Difficulty, GameSettings } from '@quick-emoji/shared';
 import { PLATFORM_LABELS, DIFFICULTY_LABELS, DEFAULT_SETTINGS } from '@quick-emoji/shared';
 import { gameStorage, validatePlatformSelection, validateDifficulty } from '../../lib/utils';
-import Loading from '../../components/Loading';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -64,7 +63,7 @@ export default function SettingsPage() {
 
       // Navigate to game page
       router.push('/game');
-    } catch (err) {
+    } catch {
       setError('設定の保存に失敗しました。');
     } finally {
       setLoading(false);

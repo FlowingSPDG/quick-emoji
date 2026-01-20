@@ -8,7 +8,7 @@ export interface Env {
 }
 
 // Hono context with environment
-export type HonoType = Hono<{ Bindings: Env }>;
+export type HonoType = { Bindings: Env };
 
 // API Response types
 export interface ApiResponse<T = any> {

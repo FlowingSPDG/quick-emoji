@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Emoji, GameSettings, Answer } from '@quick-emoji/shared';
+import type { Emoji } from '@quick-emoji/shared';
 import { apiClient, handleApiError } from '../../lib/api';
 import { gameStorage } from '../../lib/utils';
 import Loading from '../../components/Loading';
@@ -72,23 +72,20 @@ export default function GamePage() {
     startGame();
   }, [router]);
 
-  // Timer effect
-  useEffect(() => {
-    if (!gameState.gameStarted || gameState.gameEnded || gameState.timeLeft <= 0) return;
+  // End game
+  const endGame = useCallback(async () => {
+    if (!gameState.sessionId) return;
 
-    const timer = setInterval(() => {
-      setGameState(prev => {
-        if (prev.timeLeft <= 1) {
-          // Time's up - submit empty answer
-          handleSubmitAnswer('');
-          return { ...prev, timeLeft: 0 };
-        }
-        return { ...prev, timeLeft: prev.timeLeft - 1 };
-      });
-    }, 1000);
+    try {
+      await apiClient.session.end({ sessionId: gameState.sessionId });
+      gameStorage.clearSession();
 
-    return () => clearInterval(timer);
-  }, [gameState.gameStarted, gameState.gameEnded, gameState.timeLeft]);
+      // Navigate to results
+      router.push(`/result?sessionId=${gameState.sessionId}`);
+    } catch (err) {
+      setError(handleApiError(err));
+    }
+  }, [gameState.sessionId, router]);
 
   // Move to next question
   const nextQuestion = useCallback(() => {
@@ -109,7 +106,7 @@ export default function GamePage() {
         feedback: { type: null, message: '' }
       };
     });
-  }, [emojis]);
+  }, [emojis, endGame]);
 
   // Submit answer
   const handleSubmitAnswer = useCallback(async (answerText: string = gameState.answer) => {
@@ -144,20 +141,23 @@ export default function GamePage() {
     }
   }, [gameState.sessionId, gameState.currentEmoji, gameState.answer, gameState.timeLeft, nextQuestion]);
 
-  // End game
-  const endGame = useCallback(async () => {
-    if (!gameState.sessionId) return;
+  // Timer effect
+  useEffect(() => {
+    if (!gameState.gameStarted || gameState.gameEnded || gameState.timeLeft <= 0) return;
 
-    try {
-      const response = await apiClient.session.end({ sessionId: gameState.sessionId });
-      gameStorage.clearSession();
+    const timer = setInterval(() => {
+      setGameState(prev => {
+        if (prev.timeLeft <= 1) {
+          // Time's up - submit empty answer
+          handleSubmitAnswer('');
+          return { ...prev, timeLeft: 0 };
+        }
+        return { ...prev, timeLeft: prev.timeLeft - 1 };
+      });
+    }, 1000);
 
-      // Navigate to results
-      router.push(`/result?sessionId=${gameState.sessionId}`);
-    } catch (err) {
-      setError(handleApiError(err));
-    }
-  }, [gameState.sessionId, router]);
+    return () => clearInterval(timer);
+  }, [gameState.gameStarted, gameState.gameEnded, gameState.timeLeft, handleSubmitAnswer]);
 
   // Handle answer input
   const handleAnswerChange = (value: string) => {

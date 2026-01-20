@@ -1,186 +1,38 @@
-# 🎯 Quick Emoji - 絵文字早押しクイズゲーム
+# Quick Emoji
 
-絵文字を見て瞬時にそのshortcode（略称）を入力する早押しクイズゲームです！
+絵文字を見て瞬時にそのshortcodeを入力する早押しクイズゲームです。GitHub、Slack、Discord、Unicodeのshortcodeに対応しており、難易度を選んでプレイできます。回答時間と難易度に応じてスコアが計算され、グローバルリーダーボードで他のプレイヤーと競い合えます。
 
-## ✨ 特徴
+## システム概要
 
-- **複数プラットフォーム対応**: GitHub, Slack, Discord, Unicodeのshortcodeに対応
-- **難易度調整**: イージー、ミディアム、ハードの3段階
-- **リアルタイム判定**: 即時フィードバックで学習効果が高い
-- **スコアリングシステム**: 時間ボーナスと難易度ボーナス
-- **グローバルリーダーボード**: 世界中のプレイヤーと競い合える
-- **Cloudflare対応**: Pages + Workers + KVで高速・スケーラブル
+フロントエンドとバックエンドが分離された構成です。フロントエンドはNext.jsで構築され、ゲーム画面やリーダーボードを表示します。バックエンドはCloudflare Workers上で動作するAPIサーバーで、ゲームセッション管理、回答判定、スコア計算、リーダーボード管理を担当します。データはCloudflare KVに保存され、絵文字データ、ゲームセッション、リーダーボード情報が格納されます。
 
-## 🚀 技術スタック
+## インフラ構成
 
-- **Frontend**: Next.js 15 (App Router), TypeScript, CSS Modules
-- **Backend**: Hono (Cloudflare Workers), TypeScript
-- **Database**: Cloudflare KV
-- **Deployment**: Cloudflare Pages + Workers
-- **Package Manager**: npm workspaces
+フロントエンドはCloudflare Pagesにデプロイされます。バックエンドAPIはCloudflare Workersとして動作し、エッジコンピューティングにより低レイテンシで応答します。データストアにはCloudflare KVを使用し、絵文字データ、ゲームセッション、リーダーボードの3つのKVネームスペースで管理しています。プレビュー環境はGitHub Actionsのワークフローで自動的に構築され、プルリクエストごとにプレビュー用のWorkers環境が作成されます。
 
-## 📁 プロジェクト構造
+## 技術スタック
 
-```
-quick-emoji/
-├── apps/
-│   ├── web/                    # Next.js フロントエンド
-│   │   ├── app/               # App Router pages
-│   │   ├── components/        # React components
-│   │   └── lib/               # Utilities and API client
-│   └── api/                   # Hono API (Cloudflare Workers)
-│       ├── src/
-│       │   ├── routes/        # API route handlers
-│       │   ├── lib/          # Utilities and helpers
-│       │   └── data/         # Processed emoji data
-│       └── wrangler.toml     # Cloudflare Workers config
-├── packages/
-│   └── shared/                # Shared types and constants
-├── scripts/                   # Deployment and utility scripts
-└── data/                     # Raw emoji data
-```
+### フロントエンド
+- Next.js 15.0.0 (App Router)
+- React 18.3.1
+- TypeScript 5.3.3
 
-## 🛠️ セットアップ
+### バックエンド
+- Hono 4.0.0
+- Cloudflare Workers
+- TypeScript 5.3.3
 
-### 必要条件
+### データストア
+- Cloudflare KV
 
-- Node.js 18+
-- npm
-- Cloudflare アカウント
+### デプロイ
+- Cloudflare Pages (フロントエンド)
+- Cloudflare Workers (バックエンド)
 
-### インストール
+### 開発環境
+- npm workspaces
+- Wrangler 3.19.0
 
-```bash
-# リポジトリをクローン
-git clone <repository-url>
-cd quick-emoji
-
-# 依存関係をインストール
-npm install
-
-# 絵文字データを処理
-npm run import-data
-```
-
-### 開発サーバーの起動
-
-```bash
-# フロントエンド開発サーバー
-npm run dev
-
-# API開発サーバー（別ターミナル）
-npm run dev:api
-```
-
-## 🚀 デプロイ
-
-### Cloudflareへのデプロイ
-
-1. **Cloudflareアカウントの設定**
-   ```bash
-   npx wrangler auth login
-   ```
-
-2. **KV Namespaceの作成**
-   ```bash
-   # Wrangler CLIでKV namespaceを作成
-   npx wrangler kv:namespace create "EMOJI_DATA"
-   npx wrangler kv:namespace create "GAME_SESSIONS"
-   npx wrangler kv:namespace create "LEADERBOARD"
-   ```
-
-3. **デプロイ実行**
-   ```bash
-   npm run deploy
-   ```
-
-4. **絵文字データのインポート**
-   ```bash
-   npm run import-data
-   ```
-
-### 環境変数の設定
-
-Cloudflare Pagesダッシュボードで以下の環境変数を設定：
-
-```
-NEXT_PUBLIC_API_URL=https://your-worker-subdomain.your-account.workers.dev
-```
-
-## 🎮 ゲームルール
-
-1. **設定**: プラットフォーム、難易度、問題数、制限時間を選択
-2. **ゲーム開始**: 絵文字が表示される
-3. **回答**: 絵文字のshortcodeを素早く入力（例: `:smile:`）
-4. **判定**: 正解/不正解が即座に表示
-5. **スコア**: 時間ボーナス + 難易度ボーナスで計算
-6. **結果**: 最終スコアと統計、リーダーボード順位を表示
-
-### スコア計算式
-
-```
-基本スコア (10点) + 時間ボーナス (残り時間 × 0.5) + 難易度ボーナス (難易度レベル × 5)
-```
-
-## 📊 API エンドポイント
-
-### 絵文字関連
-- `GET /api/emojis` - 絵文字一覧取得（フィルタリング対応）
-
-### セッション関連
-- `POST /api/session/start` - ゲームセッション開始
-- `POST /api/session/answer` - 回答送信・判定
-- `POST /api/session/end` - セッション終了・スコア計算
-
-### リーダーボード関連
-- `GET /api/leaderboard` - リーダーボード取得
-
-## 🔒 セキュリティ
-
-- **レート制限**: IPベースおよびセッションベースのレート制限
-- **入力バリデーション**: すべてのユーザー入力の検証
-- **CORS設定**: 許可されたオリジンのみアクセス可能
-- **エラーハンドリング**: 詳細なエラーログとユーザーフレンドリーなメッセージ
-
-## 🎨 カスタマイズ
-
-### 絵文字データの追加
-
-1. `data/emojis.json` に新しい絵文字を追加
-2. スクリプトを実行してデータを処理
-   ```bash
-   npm run import-data
-   ```
-
-### スタイルのカスタマイズ
-
-`apps/web/app/globals.css` でCSS変数を変更：
-
-```css
-:root {
-  --primary-color: #0070f3;
-  --secondary-color: #6c757d;
-  --success-color: #28a745;
-  --danger-color: #dc3545;
-}
-```
-
-## 🤝 貢献
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 ライセンス
+## ライセンス
 
 MIT License
-
-## 🙏 謝辞
-
-絵文字データは各プラットフォームの公式ドキュメントを参考に作成しています。
-
----
-
-**楽しんでプレイしてください！ 🎉**

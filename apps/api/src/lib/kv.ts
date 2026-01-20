@@ -19,8 +19,11 @@ export const getEmojis = async (env: Env, options?: {
     } else {
       // Fallback to processed data file (for development)
       try {
+        // @ts-ignore - Node.js specific code for development
         const fs = require('fs');
+        // @ts-ignore - Node.js specific code for development
         const path = require('path');
+        // @ts-ignore - Node.js specific code for development
         const dataPath = path.join(__dirname, '../data/emojis-processed.json');
         const fileData = fs.readFileSync(dataPath, 'utf-8');
         const processed = JSON.parse(fileData);

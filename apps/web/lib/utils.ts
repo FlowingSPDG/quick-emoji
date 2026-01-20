@@ -1,4 +1,4 @@
-import type { Platform, Difficulty } from '@quick-emoji/shared';
+import type { Platform, Difficulty, GameSettings } from '@quick-emoji/shared';
 
 // Generate a unique ID for client-side use
 export const generateId = (): string => {
@@ -46,7 +46,7 @@ export const clamp = (value: number, min: number, max: number): number => {
 };
 
 // Debounce function
-export const debounce = <T extends (...args: any[]) => any>(
+export const debounce = <T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
@@ -89,10 +89,15 @@ export const storage = {
 };
 
 // Game state persistence
+interface SessionData {
+  sessionId: string;
+  settings: GameSettings;
+}
+
 export const gameStorage = {
-  saveSettings: (settings: any) => storage.set('game-settings', settings),
-  getSettings: () => storage.get('game-settings', null),
-  saveSession: (session: any) => storage.set('current-session', session),
-  getSession: () => storage.get('current-session', null),
+  saveSettings: (settings: GameSettings) => storage.set('game-settings', settings),
+  getSettings: (): GameSettings | null => storage.get('game-settings', null),
+  saveSession: (session: SessionData) => storage.set('current-session', session),
+  getSession: (): SessionData | null => storage.get('current-session', null),
   clearSession: () => storage.remove('current-session'),
 };
