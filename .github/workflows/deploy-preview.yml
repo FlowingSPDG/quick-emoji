@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -44,7 +44,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -54,10 +54,17 @@ jobs:
       - name: Configure Preview Deployment
         run: |
           cd apps/api
-          # Create a temporary wrangler.toml for preview
-          sed "s/name = \"quick-emoji-api\"/name = \"quick-emoji-api-preview-${{ github.event.number }}\"/" wrangler.toml > wrangler-preview.toml
-          mv wrangler-preview.toml wrangler.toml
+          # Replace worker name
+          sed -i "s/name = \"quick-emoji-api\"/name = \"quick-emoji-api-preview-${{ github.event.number }}\"/" wrangler.toml
+          # Replace environment variables in KV namespace IDs
+          sed -i "s/\${EMOJI_DATA_ID}/$EMOJI_DATA_ID/g" wrangler.toml
+          sed -i "s/\${GAME_SESSIONS_ID}/$GAME_SESSIONS_ID/g" wrangler.toml
+          sed -i "s/\${LEADERBOARD_ID}/$LEADERBOARD_ID/g" wrangler.toml
           cd ../..
+        env:
+          EMOJI_DATA_ID: ${{ secrets.EMOJI_DATA_ID }}
+          GAME_SESSIONS_ID: ${{ secrets.GAME_SESSIONS_ID }}
+          LEADERBOARD_ID: ${{ secrets.LEADERBOARD_ID }}
 
       # Deploy API with preview name
       - name: Deploy API to Cloudflare Workers (Preview)
@@ -67,10 +74,6 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/api
           command: deploy
-        env:
-          EMOJI_DATA_ID: ${{ secrets.EMOJI_DATA_ID }}
-          GAME_SESSIONS_ID: ${{ secrets.GAME_SESSIONS_ID }}
-          LEADERBOARD_ID: ${{ secrets.LEADERBOARD_ID }}
 
       # Set preview Worker URL
       - name: Set Preview Worker URL
