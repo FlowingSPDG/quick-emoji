@@ -54,12 +54,11 @@ jobs:
         NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}
 
     - name: Deploy to Cloudflare Pages
-      uses: cloudflare/pages-action@v1
+      uses: cloudflare/wrangler-action@v3
       with:
         apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
-        directory: apps/web/out
+        command: pages deploy apps/web/out --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }}
         gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Import emoji data

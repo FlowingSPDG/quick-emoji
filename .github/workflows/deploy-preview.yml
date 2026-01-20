@@ -86,17 +86,23 @@ jobs:
         id: list-projects
         run: |
           echo "📋 Listing all Cloudflare Pages projects..."
-          PROJECTS=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
+          RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-            -H "Content-Type: application/json" | jq -r '.result[]?.name' || echo "")
+            -H "Content-Type: application/json")
           
-          if [ -z "$PROJECTS" ]; then
-            echo "⚠️ Could not fetch projects list or no projects found"
+          if echo "$RESPONSE" | jq -e '.success == true' > /dev/null 2>&1; then
+            PROJECTS=$(echo "$RESPONSE" | jq -r '.result[]?.name // empty' | grep -v '^$' || echo "")
+            if [ -z "$PROJECTS" ]; then
+              echo "⚠️ No Pages projects found in your account"
+            else
+              echo "Available projects:"
+              echo "$PROJECTS" | while read -r project; do
+                echo "  - $project"
+              done
+            fi
           else
-            echo "Available projects:"
-            echo "$PROJECTS" | while read -r project; do
-              echo "  - $project"
-            done
+            echo "⚠️ Could not fetch projects list"
+            echo "Response: $RESPONSE"
           fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -105,16 +111,19 @@ jobs:
       - name: Verify project name secret
         run: |
           PROJECT_NAME="${{ secrets.CLOUDFLARE_PROJECT_NAME }}"
-          if [ -z "$PROJECT_NAME" ]; then
-            echo "❌ ERROR: CLOUDFLARE_PROJECT_NAME secret is not set!"
+          if [ -z "${PROJECT_NAME}" ] || [ "${PROJECT_NAME}" = "" ]; then
+            echo "❌ ERROR: CLOUDFLARE_PROJECT_NAME secret is not set or is empty!"
             echo ""
             echo "📋 To find your project name:"
             echo "1. Go to Cloudflare Dashboard: https://dash.cloudflare.com"
             echo "2. Navigate to: Workers & Pages > Pages"
-            echo "3. Click on your project"
-            echo "4. The project name is shown in the URL or project settings"
+            echo "3. The project name is shown in the project list or in the project settings"
             echo ""
-            echo "Or check the 'List Cloudflare Pages projects' step above for available projects."
+            echo "Check the 'List Cloudflare Pages projects' step above for available projects."
+            echo ""
+            echo "To set the secret:"
+            echo "1. Go to GitHub repository > Settings > Secrets and variables > Actions"
+            echo "2. Add or update CLOUDFLARE_PROJECT_NAME with the exact project name"
             exit 1
           fi
           echo "✅ CLOUDFLARE_PROJECT_NAME is set: $PROJECT_NAME"
@@ -122,14 +131,12 @@ jobs:
 
       - name: Deploy web app to preview
         id: deploy-web
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
-          directory: apps/web/out
+          command: pages deploy apps/web/out --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }} --branch=${{ github.head_ref }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.head_ref }}
 
       - name: Comment preview URLs on PR
         uses: actions/github-script@v7
