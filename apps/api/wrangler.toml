@@ -2,15 +2,11 @@ name = "quick-emoji-api"
 main = "src/index.ts"
 compatibility_date = "2024-01-20"
 
-# KV Namespaces - Replace with your actual KV namespace IDs
-# To create KV namespaces, run:
-# npx wrangler kv:namespace create "EMOJI_DATA"
-# npx wrangler kv:namespace create "GAME_SESSIONS"
-# npx wrangler kv:namespace create "LEADERBOARD"
+# KV Namespaces - IDs are provided via environment variables from GitHub Secrets
 kv_namespaces = [
-  { binding = "EMOJI_DATA", id = "your-emoji-data-namespace-id", preview_id = "your-emoji-data-namespace-id" },
-  { binding = "GAME_SESSIONS", id = "your-game-sessions-namespace-id", preview_id = "your-game-sessions-namespace-id" },
-  { binding = "LEADERBOARD", id = "your-leaderboard-namespace-id", preview_id = "your-leaderboard-namespace-id" }
+  { binding = "EMOJI_DATA", id = "${EMOJI_DATA_ID}" },
+  { binding = "GAME_SESSIONS", id = "${GAME_SESSIONS_ID}" },
+  { binding = "LEADERBOARD", id = "${LEADERBOARD_ID}" }
 ]
 
 # CORS configuration
@@ -24,12 +20,11 @@ NODE_ENV = "production"
 # Preview environment configuration (used for PR deployments)
 [env.preview]
 name = "quick-emoji-api-preview-${PR_NUMBER}"
-# Preview environments use the same KV namespaces as production for simplicity
-# In production, you might want separate preview namespaces
+# Preview environments use the same KV namespaces as production
 kv_namespaces = [
-  { binding = "EMOJI_DATA", id = "your-emoji-data-namespace-id" },
-  { binding = "GAME_SESSIONS", id = "your-game-sessions-namespace-id" },
-  { binding = "LEADERBOARD", id = "your-leaderboard-namespace-id" }
+  { binding = "EMOJI_DATA", id = "${EMOJI_DATA_ID}" },
+  { binding = "GAME_SESSIONS", id = "${GAME_SESSIONS_ID}" },
+  { binding = "LEADERBOARD", id = "${LEADERBOARD_ID}" }
 ]
 
 [env.preview.vars]

@@ -28,10 +28,6 @@ jobs:
       - name: Setup Wrangler
         run: npm install -g wrangler
 
-      - name: Update KV namespace IDs
-        run: node scripts/update-kv-ids.js
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy API to production
@@ -40,6 +36,10 @@ jobs:
           npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          EMOJI_DATA_ID: ${{ secrets.KV_EMOJI_DATA_ID }}
+          GAME_SESSIONS_ID: ${{ secrets.KV_GAME_SESSIONS_ID }}
+          LEADERBOARD_ID: ${{ secrets.KV_LEADERBOARD_ID }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Get production API URL
@@ -51,6 +51,10 @@ jobs:
         working-directory: apps/api
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          EMOJI_DATA_ID: ${{ secrets.KV_EMOJI_DATA_ID }}
+          GAME_SESSIONS_ID: ${{ secrets.KV_GAME_SESSIONS_ID }}
+          LEADERBOARD_ID: ${{ secrets.KV_LEADERBOARD_ID }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Build web app for production
@@ -66,6 +70,10 @@ jobs:
           npx wrangler pages deploy out --compatibility-date=2024-01-20 --branch main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          EMOJI_DATA_ID: ${{ secrets.KV_EMOJI_DATA_ID }}
+          GAME_SESSIONS_ID: ${{ secrets.KV_GAME_SESSIONS_ID }}
+          LEADERBOARD_ID: ${{ secrets.KV_LEADERBOARD_ID }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Create deployment notification
