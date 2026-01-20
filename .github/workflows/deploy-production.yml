@@ -25,6 +25,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run type check
+        run: npm run type-check
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
       - name: Verify environment variables
         run: |
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
@@ -97,44 +106,48 @@ jobs:
         continue-on-error: false
         run: |
           cd apps/web
-          # Use API URL from deploy step, or fallback to default format
-          if [ -z "${{ steps.deploy-api.outputs.api_url }}" ]; then
-            echo "⚠️ API URL not set, using fallback"
-            export NEXT_PUBLIC_API_URL="https://quick-emoji-api.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
-          fi
-          echo "Building with NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}"
+          echo "Building with NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}"
           npm run build
         env:
-          NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url || format('https://quick-emoji-api.{0}.workers.dev', secrets.CLOUDFLARE_ACCOUNT_ID) }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}
+
+      - name: Set project name
+        id: set-project-name
+        run: |
+          PROJECT_NAME="${{ secrets.CLOUDFLARE_PROJECT_NAME }}"
+          if [ -z "$PROJECT_NAME" ]; then
+            echo "⚠️ CLOUDFLARE_PROJECT_NAME secret is not set, using default: quick-emoji"
+            PROJECT_NAME="quick-emoji"
+          else
+            echo "✅ Using CLOUDFLARE_PROJECT_NAME: $PROJECT_NAME"
+          fi
+          echo "project_name=$PROJECT_NAME" >> $GITHUB_OUTPUT
 
       - name: Deploy web app to production
-        run: |
-          cd apps/web
-          npx wrangler pages deploy out --compatibility-date=2024-01-20 --branch main
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          EMOJI_DATA_ID: ${{ secrets.KV_EMOJI_DATA_ID }}
-          GAME_SESSIONS_ID: ${{ secrets.KV_GAME_SESSIONS_ID }}
-          LEADERBOARD_ID: ${{ secrets.KV_LEADERBOARD_ID }}
+        id: deploy-web
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ steps.set-project-name.outputs.project_name }}
+          directory: apps/web/out
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
 
       - name: Create deployment notification
         uses: actions/github-script@v7
         with:
           script: |
             const apiUrl = '${{ steps.deploy-api.outputs.api_url }}';
-            const pagesUrl = 'https://quick-emoji.pages.dev';
+            const webUrl = '${{ steps.deploy-web.outputs.url }}';
             
             const body = `## ✅ Production Deployment Complete
             
             **API URL:** ${apiUrl}
-            **Web URL:** ${pagesUrl}
+            **Web URL:** ${webUrl}
             
             Deployed to production from commit: ${context.sha.substring(0, 7)}
             
             [View Deployment](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})`;
             
-            // For push events, we can't comment on an issue, so we'll create a deployment status
-            // or just log it (GitHub Actions will show the output)
             console.log(body);

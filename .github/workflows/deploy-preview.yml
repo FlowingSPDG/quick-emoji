@@ -82,13 +82,25 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}
 
+      - name: Set project name
+        id: set-project-name
+        run: |
+          PROJECT_NAME="${{ secrets.CLOUDFLARE_PROJECT_NAME }}"
+          if [ -z "$PROJECT_NAME" ]; then
+            echo "⚠️ CLOUDFLARE_PROJECT_NAME secret is not set, using default: quick-emoji"
+            PROJECT_NAME="quick-emoji"
+          else
+            echo "✅ Using CLOUDFLARE_PROJECT_NAME: $PROJECT_NAME"
+          fi
+          echo "project_name=$PROJECT_NAME" >> $GITHUB_OUTPUT
+
       - name: Deploy web app to preview
         id: deploy-web
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+          projectName: ${{ steps.set-project-name.outputs.project_name }}
           directory: apps/web/out
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
