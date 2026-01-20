@@ -82,17 +82,43 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}
 
-      - name: Set project name
-        id: set-project-name
+      - name: List Cloudflare Pages projects
+        id: list-projects
+        run: |
+          echo "📋 Listing all Cloudflare Pages projects..."
+          PROJECTS=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" | jq -r '.result[]?.name' || echo "")
+          
+          if [ -z "$PROJECTS" ]; then
+            echo "⚠️ Could not fetch projects list or no projects found"
+          else
+            echo "Available projects:"
+            echo "$PROJECTS" | while read -r project; do
+              echo "  - $project"
+            done
+          fi
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Verify project name secret
         run: |
           PROJECT_NAME="${{ secrets.CLOUDFLARE_PROJECT_NAME }}"
           if [ -z "$PROJECT_NAME" ]; then
-            echo "⚠️ CLOUDFLARE_PROJECT_NAME secret is not set, using default: quick-emoji"
-            PROJECT_NAME="quick-emoji"
-          else
-            echo "✅ Using CLOUDFLARE_PROJECT_NAME: $PROJECT_NAME"
+            echo "❌ ERROR: CLOUDFLARE_PROJECT_NAME secret is not set!"
+            echo ""
+            echo "📋 To find your project name:"
+            echo "1. Go to Cloudflare Dashboard: https://dash.cloudflare.com"
+            echo "2. Navigate to: Workers & Pages > Pages"
+            echo "3. Click on your project"
+            echo "4. The project name is shown in the URL or project settings"
+            echo ""
+            echo "Or check the 'List Cloudflare Pages projects' step above for available projects."
+            exit 1
           fi
-          echo "project_name=$PROJECT_NAME" >> $GITHUB_OUTPUT
+          echo "✅ CLOUDFLARE_PROJECT_NAME is set: $PROJECT_NAME"
+          echo "Using project name: $PROJECT_NAME"
 
       - name: Deploy web app to preview
         id: deploy-web
@@ -100,7 +126,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: ${{ steps.set-project-name.outputs.project_name }}
+          projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
           directory: apps/web/out
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
