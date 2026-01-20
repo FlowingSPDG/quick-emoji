@@ -83,6 +83,9 @@ jobs:
     timeout-minutes: 20
     needs: [ci]
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
     environment:
       name: preview-${{ github.event.number }}
       url: ${{ steps.deploy-web.outputs.url }}
