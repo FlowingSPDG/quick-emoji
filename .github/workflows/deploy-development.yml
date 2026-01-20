@@ -120,7 +120,7 @@ jobs:
             echo "2. Navigate to: Workers & Pages > Pages"
             echo "3. The project name is shown in the project list or in the project settings"
             echo ""
-            echo "Check the 'List Cloudflare Pages projects' step above for available projects."
+            echo "Check Cloudflare Dashboard > Workers & Pages > Pages for available projects."
             echo ""
             echo "To set the secret:"
             echo "1. Go to GitHub repository > Settings > Secrets and variables > Actions"
