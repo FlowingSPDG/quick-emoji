@@ -342,7 +342,55 @@ score = 10 + (remainingTime * 0.5) + difficultyBonus
 
 ## デプロイ手順
 
-### 1. Cloudflare Workers セットアップ
+### GitHub Actions自動デプロイ（推奨）
+
+このプロジェクトではGitHub Actionsを使用して完全自動化されたCI/CDパイプラインを実装しています。
+
+#### ワークフロー構成
+
+1. **CIワークフロー** (`.github/workflows/ci.yml`)
+   - トリガー: 全ブランチのpush/PR
+   - 実行内容: テスト、型チェック、リンティング
+
+2. **プレビューデプロイ** (`.github/workflows/deploy-preview.yml`)
+   - トリガー: PR作成/更新
+   - 実行内容: プレビュー環境自動デプロイ + PRコメント
+
+3. **本番デプロイ** (`.github/workflows/deploy-production.yml`)
+   - トリガー: mainブランチpush
+   - 実行内容: 本番環境自動デプロイ
+
+4. **開発環境デプロイ** (`.github/workflows/deploy-development.yml`)
+   - トリガー: developブランチpush
+   - 実行内容: 開発環境自動デプロイ
+
+#### 必要な設定
+
+##### GitHub Secrets
+```bash
+# Cloudflare認証
+CLOUDFLARE_API_TOKEN=your_api_token
+CLOUDFLARE_ACCOUNT_ID=your_account_id
+
+# KV Namespace ID
+EMOJI_DATA_ID=your_namespace_id
+GAME_SESSIONS_ID=your_namespace_id
+LEADERBOARD_ID=your_namespace_id
+
+# Pagesプロジェクト（開発環境用）
+CLOUDFLARE_PROJECT_NAME=your_project_name
+```
+
+##### KV Namespace作成
+```bash
+npx wrangler kv:namespace create "EMOJI_DATA"
+npx wrangler kv:namespace create "GAME_SESSIONS"
+npx wrangler kv:namespace create "LEADERBOARD"
+```
+
+### 手動デプロイ（レガシー）
+
+#### 1. Cloudflare Workers セットアップ
 ```bash
 npm install -g wrangler
 wrangler login
@@ -350,14 +398,14 @@ cd apps/api
 wrangler deploy
 ```
 
-### 2. KV Namespace 作成
+#### 2. KV Namespace 作成
 ```bash
 wrangler kv:namespace create "EMOJI_DATA"
 wrangler kv:namespace create "GAME_SESSIONS"
 wrangler kv:namespace create "LEADERBOARD"
 ```
 
-### 3. wrangler.toml 設定
+#### 3. wrangler.toml 設定
 ```toml
 name = "quick-emoji-api"
 main = "src/index.ts"
@@ -370,16 +418,16 @@ kv_namespaces = [
 ]
 ```
 
-### 4. 絵文字データの初期投入
+#### 4. 絵文字データの初期投入
 ```bash
 npm run import-data
 ```
 
-### 5. フロントエンドデプロイ
+#### 5. フロントエンドデプロイ
 ```bash
 cd apps/web
 npm run build
-# Cloudflare Pagesにデプロイ
+npx wrangler pages deploy out --compatibility-date=2024-01-20
 ```
 
 ## パフォーマンス最適化

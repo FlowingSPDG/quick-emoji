@@ -77,7 +77,56 @@ npm run lint         # リンティング
 
 ## 🚀 デプロイ
 
-### Cloudflareへのデプロイ
+### GitHub Actions CI/CD
+
+このプロジェクトではGitHub Actionsを使用して自動デプロイを設定しています。
+
+#### ワークフロー概要
+
+- **CIワークフロー** (`ci.yml`): すべてのPRとpushでテスト実行
+- **プレビューデプロイ** (`deploy-preview.yml`): PRごとにプレビュー環境を自動デプロイ
+- **本番デプロイ** (`deploy-production.yml`): mainブランチにpushで本番環境に自動デプロイ
+- **開発環境デプロイ** (`deploy-development.yml`): developブランチにpushで開発環境に自動デプロイ
+
+#### 必要なGitHub Secrets設定
+
+GitHub Actionsを使用するには、以下のSecretsをリポジトリに設定してください：
+
+1. **Cloudflare認証情報**:
+   - `CLOUDFLARE_API_TOKEN`: Cloudflare API Token
+   - `CLOUDFLARE_ACCOUNT_ID`: Cloudflare Account ID
+
+2. **KV Namespace ID**:
+   - `EMOJI_DATA_ID`: EMOJI_DATA Namespace ID
+   - `GAME_SESSIONS_ID`: GAME_SESSIONS Namespace ID
+   - `LEADERBOARD_ID`: LEADERBOARD Namespace ID
+
+3. **Pagesプロジェクト** (開発環境用):
+   - `CLOUDFLARE_PROJECT_NAME`: Cloudflare Pagesプロジェクト名
+
+##### Secrets設定手順
+
+1. Cloudflareダッシュボード → Account → API Tokens
+2. 「Create Token」→「Edit Cloudflare Workers」テンプレートを使用
+3. 必要な権限を設定（Workers:Edit, Pages:Edit, Account:Read）
+4. GitHubリポジトリ → Settings → Secrets and variables → Actions
+5. 上記のSecretsを追加
+
+#### KV Namespace作成
+
+```bash
+# Cloudflare WorkersでKV Namespaceを作成
+npx wrangler kv:namespace create "EMOJI_DATA"
+npx wrangler kv:namespace create "GAME_SESSIONS"
+npx wrangler kv:namespace create "LEADERBOARD"
+
+# 作成されたNamespace IDを確認
+npx wrangler kv:namespace list
+```
+
+#### 手動デプロイ（フォールバック）
+
+GitHub Actionsが利用できない場合の手動デプロイスクリプト：
 ```bash
 npm run deploy
 ```

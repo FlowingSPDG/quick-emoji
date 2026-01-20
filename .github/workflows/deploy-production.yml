@@ -2,16 +2,14 @@ name: Deploy Production
 
 on:
   push:
-    branches: [main]
-
-concurrency:
-  group: production
-  cancel-in-progress: false
+    branches:
+      - main
 
 jobs:
-  deploy-production:
+  test:
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 10
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,194 +17,71 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run type check
+      - name: Type check
         run: npm run type-check
 
-      - name: Run lint
+      - name: Lint
         run: npm run lint
 
-      - name: Run tests
+      - name: Run unit tests
         run: npm test
 
-      - name: Verify environment variables
-        run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "❌ CLOUDFLARE_API_TOKEN is not set"
-            exit 1
-          fi
-          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "❌ CLOUDFLARE_ACCOUNT_ID is not set"
-            exit 1
-          fi
-          echo "✅ Required environment variables are set"
-          echo "CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:0:8}..."
-          echo "KV Namespaces configured: ${EMOJI_DATA_ID:+Yes} ${GAME_SESSIONS_ID:+Yes} ${LEADERBOARD_ID:+Yes}"
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
 
-      - name: Deploy API to production
-        id: deploy-api
-        continue-on-error: false
-        run: |
-          set -e
-          cd apps/api
-          echo "Verifying wrangler.toml..."
-          cat wrangler.toml
-          echo ""
-          echo "Verifying package.json scripts..."
-          npm run deploy --dry-run 2>&1 || true
-          echo ""
-          echo "Running wrangler deploy..."
-          # Use --env="" to explicitly target the top-level environment
-          # Redirect both stdout and stderr to capture all output
-          DEPLOY_OUTPUT=$(npx wrangler deploy --env="" 2>&1) || {
-            EXIT_CODE=$?
-            echo "⚠️ Deploy command failed with exit code: $EXIT_CODE"
-            echo "Deploy output:"
-            echo "$DEPLOY_OUTPUT"
-            
-            # Check if it's a known error that we can handle
-            if echo "$DEPLOY_OUTPUT" | grep -q "Could not route to.*workers/services"; then
-              echo "⚠️ Cloudflare API routing error - this might be a permissions or account ID issue"
-              echo "Falling back to default API URL format..."
-              API_URL="https://quick-emoji-api.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
-              echo "api_url=$API_URL" >> $GITHUB_OUTPUT
-              echo "Using fallback API URL: $API_URL"
-              # Don't exit - continue with fallback URL
-            else
-              echo "❌ Deploy failed with unknown error"
-              exit $EXIT_CODE
-            fi
-          }
-          
-          # If deploy succeeded, extract URL from output
-          if [ -z "${API_URL:-}" ]; then
-            echo "$DEPLOY_OUTPUT"
-            API_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.workers\.dev' | head -1 || echo "")
-            if [ -z "$API_URL" ]; then
-              echo "⚠️ Could not extract API URL from output, using fallback"
-              API_URL="https://quick-emoji-api.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
-            fi
-            echo "api_url=$API_URL" >> $GITHUB_OUTPUT
-          fi
-          
-          echo "✅ API deployed successfully to: $API_URL"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Deploy API first
+      - name: Deploy API to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/api
+          command: deploy
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          EMOJI_DATA_ID: ${{ secrets.KV_EMOJI_DATA_ID }}
-          GAME_SESSIONS_ID: ${{ secrets.KV_GAME_SESSIONS_ID }}
-          LEADERBOARD_ID: ${{ secrets.KV_LEADERBOARD_ID }}
+          EMOJI_DATA_ID: ${{ secrets.EMOJI_DATA_ID }}
+          GAME_SESSIONS_ID: ${{ secrets.GAME_SESSIONS_ID }}
+          LEADERBOARD_ID: ${{ secrets.LEADERBOARD_ID }}
 
-      - name: Build web app for production
-        continue-on-error: false
+      # Extract deployed Worker URL
+      - name: Get Worker URL
+        id: worker-url
+        run: |
+          # Extract Worker URL from wrangler output (simplified approach)
+          # In production, you might want to use a more robust method
+          echo "worker_url=https://quick-emoji-api.${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.workers.dev" >> $GITHUB_OUTPUT
+
+      # Build frontend with API URL
+      - name: Build frontend
         run: |
           cd apps/web
-          echo "Building with NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}"
-          npm run build
-        env:
-          NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}
+          NEXT_PUBLIC_API_URL=${{ steps.worker-url.outputs.worker_url }} npm run build
+          cd ../..
 
-      - name: Verify build output directory
-        run: |
-          if [ ! -d "apps/web/out" ]; then
-            echo "❌ ERROR: apps/web/out directory does not exist!"
-            echo "Build may have failed. Checking for build errors..."
-            ls -la apps/web/ || echo "apps/web directory not found"
-            exit 1
-          fi
-          echo "✅ Build output directory exists"
-          echo "Contents of apps/web/out:"
-          ls -la apps/web/out | head -20
-
-      - name: Verify project name secret
-        run: |
-          PROJECT_NAME="${{ secrets.CLOUDFLARE_PROJECT_NAME }}"
-          if [ -z "${PROJECT_NAME}" ] || [ "${PROJECT_NAME}" = "" ]; then
-            echo "❌ ERROR: CLOUDFLARE_PROJECT_NAME secret is not set or is empty!"
-            echo ""
-            echo "📋 To find your project name:"
-            echo "1. Go to Cloudflare Dashboard: https://dash.cloudflare.com"
-            echo "2. Navigate to: Workers & Pages > Pages"
-            echo "3. The project name is shown in the project list or in the project settings"
-            echo ""
-            echo "Check Cloudflare Dashboard > Workers & Pages > Pages for available projects."
-            echo ""
-            echo "To set the secret:"
-            echo "1. Go to GitHub repository > Settings > Secrets and variables > Actions"
-            echo "2. Add or update CLOUDFLARE_PROJECT_NAME with the exact project name"
-            exit 1
-          fi
-          echo "✅ CLOUDFLARE_PROJECT_NAME is set: $PROJECT_NAME"
-          echo "Using project name: $PROJECT_NAME"
-
-      - name: Deploy web app to production
-        id: deploy-web
-        run: |
-          set -e
-          echo "🚀 Deploying to Cloudflare Pages..."
-          echo "Project name: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}"
-          echo "Branch: main"
-          echo "Directory: apps/web/out"
-          
-          # Verify directory exists
-          if [ ! -d "apps/web/out" ]; then
-            echo "❌ ERROR: apps/web/out directory does not exist!"
-            exit 1
-          fi
-          
-          # Deploy using wrangler
-          DEPLOY_OUTPUT=$(npx wrangler pages deploy apps/web/out \
-            --project-name="${{ secrets.CLOUDFLARE_PROJECT_NAME }}" \
-            --branch=main \
-            --commit-hash="${{ github.sha }}" \
-            --commit-message="${{ github.event.head_commit.message }}" \
-            2>&1) || {
-            EXIT_CODE=$?
-            echo "❌ Deploy failed with exit code: $EXIT_CODE"
-            echo "Deploy output:"
-            echo "$DEPLOY_OUTPUT"
-            exit $EXIT_CODE
-          }
-          
-          echo "$DEPLOY_OUTPUT"
-          
-          # Extract deployment URL from output
-          WEB_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.pages\.dev' | head -1 || echo "")
-          if [ -z "$WEB_URL" ]; then
-            # Try alternative URL format
-            WEB_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.cloudflarepages\.com' | head -1 || echo "")
-          fi
-          
-          if [ -z "$WEB_URL" ]; then
-            echo "⚠️ Could not extract deployment URL from output"
-            WEB_URL="https://${{ secrets.CLOUDFLARE_PROJECT_NAME }}.pages.dev"
-          fi
-          
-          echo "url=$WEB_URL" >> $GITHUB_OUTPUT
-          echo "✅ Deployment successful: $WEB_URL"
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Create deployment notification
-        uses: actions/github-script@v7
+      # Deploy frontend to Cloudflare Pages
+      - name: Deploy frontend to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
         with:
-          script: |
-            const apiUrl = '${{ steps.deploy-api.outputs.api_url }}';
-            const webUrl = '${{ steps.deploy-web.outputs.url }}';
-            
-            const body = `## ✅ Production Deployment Complete
-            
-            **API URL:** ${apiUrl}
-            **Web URL:** ${webUrl}
-            
-            Deployed to production from commit: ${context.sha.substring(0, 7)}
-            
-            [View Deployment](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})`;
-            
-            console.log(body);
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy apps/web/out --project-name=quick-emoji --compatibility-date=2024-01-20

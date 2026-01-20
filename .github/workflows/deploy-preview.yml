@@ -2,16 +2,14 @@ name: Deploy Preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
-    branches: [main]
-
-concurrency:
-  group: preview-pr-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+    branches:
+      - '**'
 
 jobs:
-  deploy-preview:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,167 +17,88 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run type check
+      - name: Type check
         run: npm run type-check
 
-      - name: Run lint
+      - name: Lint
         run: npm run lint
 
-      - name: Run tests
+      - name: Run unit tests
         run: npm test
 
-      - name: Deploy API to preview
-        id: deploy-api
-        run: |
-          set -e
-          cd apps/api
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          PREVIEW_NAME="quick-emoji-api-preview-${PR_NUMBER}"
-          
-          echo "Deploying API preview: ${PREVIEW_NAME}"
-          DEPLOY_OUTPUT=$(npx wrangler deploy --name "${PREVIEW_NAME}" --env="" 2>&1) || {
-            EXIT_CODE=$?
-            echo "⚠️ Deploy command failed with exit code: $EXIT_CODE"
-            echo "Deploy output:"
-            echo "$DEPLOY_OUTPUT"
-            
-            # Fallback to default URL format
-            API_URL="https://${PREVIEW_NAME}.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
-            echo "api_url=$API_URL" >> $GITHUB_OUTPUT
-            echo "Using fallback API URL: $API_URL"
-          }
-          
-          # Extract URL from output if deploy succeeded
-          if [ -z "${API_URL:-}" ]; then
-            echo "$DEPLOY_OUTPUT"
-            API_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.workers\.dev' | head -1 || echo "")
-            if [ -z "$API_URL" ]; then
-              echo "⚠️ Could not extract API URL from output, using fallback"
-              API_URL="https://${PREVIEW_NAME}.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
-            fi
-            echo "api_url=$API_URL" >> $GITHUB_OUTPUT
-          fi
-          
-          echo "✅ API preview deployed to: $API_URL"
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          EMOJI_DATA_ID: ${{ secrets.KV_EMOJI_DATA_ID }}
-          GAME_SESSIONS_ID: ${{ secrets.KV_GAME_SESSIONS_ID }}
-          LEADERBOARD_ID: ${{ secrets.KV_LEADERBOARD_ID }}
+  deploy-preview:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
 
-      - name: Build web app for preview
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Deploy API with preview name
+      - name: Deploy API to Cloudflare Workers (Preview)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/api
+          command: deploy --name quick-emoji-api-preview-${{ github.event.number }}
+        env:
+          EMOJI_DATA_ID: ${{ secrets.EMOJI_DATA_ID }}
+          GAME_SESSIONS_ID: ${{ secrets.GAME_SESSIONS_ID }}
+          LEADERBOARD_ID: ${{ secrets.LEADERBOARD_ID }}
+
+      # Set preview Worker URL
+      - name: Set Preview Worker URL
+        id: worker-url
+        run: |
+          # Preview Worker URL follows the pattern: https://<worker-name>.<account-subdomain>.workers.dev
+          echo "worker_url=https://quick-emoji-api-preview-${{ github.event.number }}.your-account-subdomain.workers.dev" >> $GITHUB_OUTPUT
+
+      # Build frontend with preview API URL
+      - name: Build frontend
         run: |
           cd apps/web
-          echo "Building with NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}"
-          npm run build
-        env:
-          NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}
+          NEXT_PUBLIC_API_URL=${{ steps.worker-url.outputs.worker_url }} npm run build
+          cd ../..
 
-      - name: Verify build output directory
-        run: |
-          if [ ! -d "apps/web/out" ]; then
-            echo "❌ ERROR: apps/web/out directory does not exist!"
-            echo "Build may have failed. Checking for build errors..."
-            ls -la apps/web/ || echo "apps/web directory not found"
-            exit 1
-          fi
-          echo "✅ Build output directory exists"
-          echo "Contents of apps/web/out:"
-          ls -la apps/web/out | head -20
+      # Deploy frontend to Cloudflare Pages (Preview)
+      - name: Deploy frontend to Cloudflare Pages (Preview)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy apps/web/out --project-name=quick-emoji-preview-${{ github.event.number }} --compatibility-date=2024-01-20
 
-      - name: Verify project name secret
-        run: |
-          PROJECT_NAME="${{ secrets.CLOUDFLARE_PROJECT_NAME }}"
-          if [ -z "${PROJECT_NAME}" ] || [ "${PROJECT_NAME}" = "" ]; then
-            echo "❌ ERROR: CLOUDFLARE_PROJECT_NAME secret is not set or is empty!"
-            echo ""
-            echo "📋 To find your project name:"
-            echo "1. Go to Cloudflare Dashboard: https://dash.cloudflare.com"
-            echo "2. Navigate to: Workers & Pages > Pages"
-            echo "3. The project name is shown in the project list or in the project settings"
-            echo ""
-            echo "Check Cloudflare Dashboard > Workers & Pages > Pages for available projects."
-            echo ""
-            echo "To set the secret:"
-            echo "1. Go to GitHub repository > Settings > Secrets and variables > Actions"
-            echo "2. Add or update CLOUDFLARE_PROJECT_NAME with the exact project name"
-            exit 1
-          fi
-          echo "✅ CLOUDFLARE_PROJECT_NAME is set: $PROJECT_NAME"
-          echo "Using project name: $PROJECT_NAME"
-
-      - name: Deploy web app to preview
-        id: deploy-web
-        run: |
-          set -e
-          echo "🚀 Deploying to Cloudflare Pages..."
-          echo "Project name: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}"
-          echo "Branch: ${{ github.head_ref }}"
-          echo "Directory: apps/web/out"
-          
-          # Verify directory exists
-          if [ ! -d "apps/web/out" ]; then
-            echo "❌ ERROR: apps/web/out directory does not exist!"
-            exit 1
-          fi
-          
-          # Deploy using wrangler
-          DEPLOY_OUTPUT=$(npx wrangler pages deploy apps/web/out \
-            --project-name="${{ secrets.CLOUDFLARE_PROJECT_NAME }}" \
-            --branch="${{ github.head_ref }}" \
-            --commit-hash="${{ github.sha }}" \
-            --commit-message="${{ github.event.pull_request.title }}" \
-            2>&1) || {
-            EXIT_CODE=$?
-            echo "❌ Deploy failed with exit code: $EXIT_CODE"
-            echo "Deploy output:"
-            echo "$DEPLOY_OUTPUT"
-            exit $EXIT_CODE
-          }
-          
-          echo "$DEPLOY_OUTPUT"
-          
-          # Extract deployment URL from output
-          WEB_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.pages\.dev' | head -1 || echo "")
-          if [ -z "$WEB_URL" ]; then
-            # Try alternative URL format
-            WEB_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.cloudflarepages\.com' | head -1 || echo "")
-          fi
-          
-          if [ -z "$WEB_URL" ]; then
-            echo "⚠️ Could not extract deployment URL from output"
-            WEB_URL="https://${{ secrets.CLOUDFLARE_PROJECT_NAME }}.pages.dev"
-          fi
-          
-          echo "url=$WEB_URL" >> $GITHUB_OUTPUT
-          echo "✅ Deployment successful: $WEB_URL"
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Comment preview URLs on PR
+      # Comment on PR with deployment URLs
+      - name: Comment on PR
         uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
         with:
           script: |
-            const apiUrl = '${{ steps.deploy-api.outputs.api_url }}';
-            const webUrl = '${{ steps.deploy-web.outputs.url }}';
+            const workerUrl = '${{ steps.worker-url.outputs.worker_url }}';
+            const pagesUrl = 'https://quick-emoji-preview-${{ github.event.number }}.pages.dev';
             
-            const body = `## 🎉 Preview Deployment Complete
+            const body = `## 🚀 Preview Deployment
             
-            **API URL:** ${apiUrl}
-            **Web URL:** ${webUrl}
+            ✅ **API deployed to:** ${workerUrl}
+            ✅ **Frontend deployed to:** ${pagesUrl}
             
-            Preview environment for PR #${{ github.event.pull_request.number }}
-            
-            [View Changes](${context.payload.pull_request.html_url})`;
+            You can test the preview deployment using the links above.`;
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
