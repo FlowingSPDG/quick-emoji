@@ -1,17 +1,19 @@
-name: Deploy Preview
+name: Deploy Development Preview
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches: [main]
+  push:
+    branches: [develop]
+  workflow_dispatch:
 
 concurrency:
-  group: preview-pr-${{ github.event.pull_request.number }}
+  group: development
   cancel-in-progress: true
 
 jobs:
-  deploy-preview:
+  deploy-development:
     runs-on: ubuntu-latest
+    environment: development
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,15 +36,14 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Deploy API to preview
+      - name: Deploy API to development preview
         id: deploy-api
         run: |
           set -e
           cd apps/api
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          PREVIEW_NAME="quick-emoji-api-preview-${PR_NUMBER}"
+          PREVIEW_NAME="quick-emoji-api-development"
           
-          echo "Deploying API preview: ${PREVIEW_NAME}"
+          echo "Deploying API development preview: ${PREVIEW_NAME}"
           DEPLOY_OUTPUT=$(npx wrangler deploy --name "${PREVIEW_NAME}" --env="" 2>&1) || {
             EXIT_CODE=$?
             echo "⚠️ Deploy command failed with exit code: $EXIT_CODE"
@@ -66,7 +67,7 @@ jobs:
             echo "api_url=$API_URL" >> $GITHUB_OUTPUT
           fi
           
-          echo "✅ API preview deployed to: $API_URL"
+          echo "✅ API development preview deployed to: $API_URL"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -74,7 +75,7 @@ jobs:
           GAME_SESSIONS_ID: ${{ secrets.KV_GAME_SESSIONS_ID }}
           LEADERBOARD_ID: ${{ secrets.KV_LEADERBOARD_ID }}
 
-      - name: Build web app for preview
+      - name: Build web app for development preview
         run: |
           cd apps/web
           echo "Building with NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}"
@@ -82,7 +83,7 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}
 
-      - name: Deploy web app to preview
+      - name: Deploy web app to development preview
         id: deploy-web
         uses: cloudflare/pages-action@v1
         with:
@@ -91,28 +92,22 @@ jobs:
           projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
           directory: apps/web/out
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.head_ref }}
+          branch: develop
 
-      - name: Comment preview URLs on PR
+      - name: Create deployment notification
         uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
         with:
           script: |
             const apiUrl = '${{ steps.deploy-api.outputs.api_url }}';
             const webUrl = '${{ steps.deploy-web.outputs.url }}';
             
-            const body = `## 🎉 Preview Deployment Complete
+            const body = `## ✅ Development Preview Deployment Complete
             
             **API URL:** ${apiUrl}
             **Web URL:** ${webUrl}
             
-            Preview environment for PR #${{ github.event.pull_request.number }}
+            Deployed to development preview from commit: ${context.sha.substring(0, 7)}
             
-            [View Changes](${context.payload.pull_request.html_url})`;
+            [View Deployment](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})`;
             
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            });
+            console.log(body);
