@@ -60,9 +60,9 @@ jobs:
           sed -i "s/\${LEADERBOARD_ID}/$LEADERBOARD_ID/g" wrangler.toml
           cd ../..
         env:
-          EMOJI_DATA_ID: ${{ secrets.KV_EMOJI_DATA_ID }}
-          GAME_SESSIONS_ID: ${{ secrets.KV_GAME_SESSIONS_ID }}
-          LEADERBOARD_ID: ${{ secrets.KV_LEADERBOARD_ID }}
+          EMOJI_DATA_ID: ${{ secrets.EMOJI_DATA }}
+          GAME_SESSIONS_ID: ${{ secrets.GAME_SESSIONS }}
+          LEADERBOARD_ID: ${{ secrets.LEADERBOARD }}
 
       # Deploy API with preview name
       - name: Deploy API to Cloudflare Workers (Preview)
