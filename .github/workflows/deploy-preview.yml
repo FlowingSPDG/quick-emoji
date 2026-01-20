@@ -67,49 +67,31 @@ jobs:
       # Deploy API with preview name
       - name: Deploy API to Cloudflare Workers (Preview)
         id: deploy-api
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/api
+          command: deploy --name quick-emoji-api-preview-${{ github.event.number }}
+
+      # Set Preview API URL
+      - name: Set Preview API URL
+        id: api-url
         run: |
-          set -e
-          cd apps/api
-          PREVIEW_NAME="quick-emoji-api-preview-${{ github.event.number }}"
-          
-          echo "Deploying API preview: ${PREVIEW_NAME}"
-          DEPLOY_OUTPUT=$(npx wrangler deploy --name "${PREVIEW_NAME}" --env="" 2>&1) || {
-            EXIT_CODE=$?
-            echo "⚠️ Deploy command failed with exit code: $EXIT_CODE"
-            echo "Deploy output:"
-            echo "$DEPLOY_OUTPUT"
-            
-            # Fallback to default URL format
-            API_URL="https://${PREVIEW_NAME}.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
-            echo "api_url=$API_URL" >> $GITHUB_OUTPUT
-            echo "Using fallback API URL: $API_URL"
-            exit $EXIT_CODE
-          }
-          
-          # Extract URL from output if deploy succeeded
-          if [ -z "${API_URL:-}" ]; then
-            echo "$DEPLOY_OUTPUT"
-            API_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.workers\.dev' | head -1 || echo "")
-            if [ -z "$API_URL" ]; then
-              echo "⚠️ Could not extract API URL from output, using fallback"
-              API_URL="https://${PREVIEW_NAME}.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
-            fi
-            echo "api_url=$API_URL" >> $GITHUB_OUTPUT
-          fi
-          
-          echo "✅ API preview deployed to: $API_URL"
+          API_URL="https://quick-emoji-api-preview-${{ github.event.number }}.${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.workers.dev"
+          echo "url=$API_URL" >> $GITHUB_OUTPUT
+          echo "✅ API deployed to: $API_URL"
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       # Build frontend with preview API URL
       - name: Build frontend
         run: |
           cd apps/web
-          echo "Building with NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}"
+          echo "Building with NEXT_PUBLIC_API_URL: ${{ steps.api-url.outputs.url }}"
           npm run build
         env:
-          NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}
+          NEXT_PUBLIC_API_URL: ${{ steps.api-url.outputs.url }}
 
       # Deploy frontend to Cloudflare Pages (Preview)
       - name: Deploy frontend to Cloudflare Pages (Preview)
@@ -124,7 +106,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const workerUrl = '${{ steps.deploy-api.outputs.api_url }}';
+            const workerUrl = '${{ steps.api-url.outputs.url }}';
             const pagesUrl = 'https://${{ secrets.CLOUDFLARE_PROJECT_NAME }}.pages.dev';
             
             const body = `## 🚀 Preview Deployment
