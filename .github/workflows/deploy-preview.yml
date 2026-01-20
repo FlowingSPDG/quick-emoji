@@ -117,7 +117,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/web/out --project-name=quick-emoji-preview-${{ github.event.number }} --compatibility-date=2024-01-20
+          command: pages deploy apps/web/out --project-name=quick-emoji-preview-${{ github.event.number }}
 
       # Comment on PR with deployment URLs
       - name: Comment on PR
