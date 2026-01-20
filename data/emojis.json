@@ -1,0 +1,1113 @@
+[
+  {
+    "emoji": "😀",
+    "platforms": {
+      "github": ["grinning", "smile"],
+      "slack": ["smile"],
+      "discord": ["grinning"],
+      "unicode": ["grinning_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "😂",
+    "platforms": {
+      "github": ["joy", "laughing"],
+      "slack": ["joy"],
+      "discord": ["joy"],
+      "unicode": ["face_with_tears_of_joy"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "😍",
+    "platforms": {
+      "github": ["heart_eyes", "love"],
+      "slack": ["heart_eyes"],
+      "discord": ["heart_eyes"],
+      "unicode": ["smiling_face_with_heart_eyes"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🤔",
+    "platforms": {
+      "github": ["thinking", "think"],
+      "slack": ["thinking_face"],
+      "discord": ["thinking"],
+      "unicode": ["thinking_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 2
+  },
+  {
+    "emoji": "😎",
+    "platforms": {
+      "github": ["sunglasses", "cool"],
+      "slack": ["sunglasses"],
+      "discord": ["sunglasses"],
+      "unicode": ["smiling_face_with_sunglasses"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "😊",
+    "platforms": {
+      "github": ["blush", "smile"],
+      "slack": ["blush"],
+      "discord": ["blush"],
+      "unicode": ["smiling_face_with_smiling_eyes"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "😢",
+    "platforms": {
+      "github": ["cry", "sad"],
+      "slack": ["cry"],
+      "discord": ["cry"],
+      "unicode": ["crying_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "😡",
+    "platforms": {
+      "github": ["rage", "angry"],
+      "slack": ["rage"],
+      "discord": ["rage"],
+      "unicode": ["enraged_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥺",
+    "platforms": {
+      "github": ["pleading_face"],
+      "slack": ["pleading"],
+      "discord": ["pleading_face"],
+      "unicode": ["pleading_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 2
+  },
+  {
+    "emoji": "😴",
+    "platforms": {
+      "github": ["sleeping", "sleep"],
+      "slack": ["sleeping"],
+      "discord": ["sleeping"],
+      "unicode": ["sleeping_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🤗",
+    "platforms": {
+      "github": ["hugs", "hug"],
+      "slack": ["hugging_face"],
+      "discord": ["hugs"],
+      "unicode": ["hugging_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🤐",
+    "platforms": {
+      "github": ["zipper_mouth", "silent"],
+      "slack": ["zipper_mouth_face"],
+      "discord": ["zipper_mouth"],
+      "unicode": ["zipper_mouth_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🤯",
+    "platforms": {
+      "github": ["exploding_head", "mind_blown"],
+      "slack": ["exploding_head"],
+      "discord": ["exploding_head"],
+      "unicode": ["exploding_head"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🥴",
+    "platforms": {
+      "github": ["woozy_face", "dizzy"],
+      "slack": ["woozy_face"],
+      "discord": ["woozy_face"],
+      "unicode": ["woozy_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🤪",
+    "platforms": {
+      "github": ["zany_face", "crazy"],
+      "slack": ["zany_face"],
+      "discord": ["zany_face"],
+      "unicode": ["zany_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 2
+  },
+  {
+    "emoji": "😇",
+    "platforms": {
+      "github": ["innocent", "angel"],
+      "slack": ["innocent"],
+      "discord": ["innocent"],
+      "unicode": ["smiling_face_with_halo"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🤠",
+    "platforms": {
+      "github": ["cowboy", "hat"],
+      "slack": ["cowboy_hat_face"],
+      "discord": ["cowboy"],
+      "unicode": ["cowboy_hat_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🥳",
+    "platforms": {
+      "github": ["partying_face", "party"],
+      "slack": ["partying_face"],
+      "discord": ["partying_face"],
+      "unicode": ["partying_face"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 2
+  },
+  {
+    "emoji": "😈",
+    "platforms": {
+      "github": ["devil", "imp"],
+      "slack": ["imp"],
+      "discord": ["devil"],
+      "unicode": ["devil"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "👻",
+    "platforms": {
+      "github": ["ghost", "boo"],
+      "slack": ["ghost"],
+      "discord": ["ghost"],
+      "unicode": ["ghost"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "💀",
+    "platforms": {
+      "github": ["skull", "dead"],
+      "slack": ["skull"],
+      "discord": ["skull"],
+      "unicode": ["skull"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "👽",
+    "platforms": {
+      "github": ["alien", "ufo"],
+      "slack": ["alien"],
+      "discord": ["alien"],
+      "unicode": ["alien"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🤖",
+    "platforms": {
+      "github": ["robot", "bot"],
+      "slack": ["robot_face"],
+      "discord": ["robot"],
+      "unicode": ["robot"]
+    },
+    "category": "Smileys & Emotion",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🙈",
+    "platforms": {
+      "github": ["see_no_evil", "monkey"],
+      "slack": ["see_no_evil"],
+      "discord": ["see_no_evil"],
+      "unicode": ["see_no_evil_monkey"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🙉",
+    "platforms": {
+      "github": ["hear_no_evil", "monkey"],
+      "slack": ["hear_no_evil"],
+      "discord": ["hear_no_evil"],
+      "unicode": ["hear_no_evil_monkey"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🙊",
+    "platforms": {
+      "github": ["speak_no_evil", "monkey"],
+      "slack": ["speak_no_evil"],
+      "discord": ["speak_no_evil"],
+      "unicode": ["speak_no_evil_monkey"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🐶",
+    "platforms": {
+      "github": ["dog", "puppy"],
+      "slack": ["dog"],
+      "discord": ["dog"],
+      "unicode": ["dog_face"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🐱",
+    "platforms": {
+      "github": ["cat", "kitten"],
+      "slack": ["cat"],
+      "discord": ["cat"],
+      "unicode": ["cat_face"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🐭",
+    "platforms": {
+      "github": ["mouse", "rat"],
+      "slack": ["mouse"],
+      "discord": ["mouse_face"],
+      "unicode": ["mouse_face"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🐹",
+    "platforms": {
+      "github": ["hamster", "pet"],
+      "slack": ["hamster"],
+      "discord": ["hamster"],
+      "unicode": ["hamster"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🐰",
+    "platforms": {
+      "github": ["rabbit", "bunny"],
+      "slack": ["rabbit"],
+      "discord": ["rabbit"],
+      "unicode": ["rabbit_face"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🦊",
+    "platforms": {
+      "github": ["fox", "animal"],
+      "slack": ["fox_face"],
+      "discord": ["fox_face"],
+      "unicode": ["fox"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🐻",
+    "platforms": {
+      "github": ["bear", "animal"],
+      "slack": ["bear"],
+      "discord": ["bear"],
+      "unicode": ["bear"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🐼",
+    "platforms": {
+      "github": ["panda", "bear"],
+      "slack": ["panda_face"],
+      "discord": ["panda_face"],
+      "unicode": ["panda"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🐨",
+    "platforms": {
+      "github": ["koala", "bear"],
+      "slack": ["koala"],
+      "discord": ["koala"],
+      "unicode": ["koala"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🐯",
+    "platforms": {
+      "github": ["tiger", "cat"],
+      "slack": ["tiger"],
+      "discord": ["tiger"],
+      "unicode": ["tiger_face"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🦁",
+    "platforms": {
+      "github": ["lion", "animal"],
+      "slack": ["lion_face"],
+      "discord": ["lion_face"],
+      "unicode": ["lion"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🐸",
+    "platforms": {
+      "github": ["frog", "animal"],
+      "slack": ["frog"],
+      "discord": ["frog"],
+      "unicode": ["frog"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🐵",
+    "platforms": {
+      "github": ["monkey", "animal"],
+      "slack": ["monkey_face"],
+      "discord": ["monkey_face"],
+      "unicode": ["monkey_face"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🙈",
+    "platforms": {
+      "github": ["see_no_evil", "monkey"],
+      "slack": ["see_no_evil"],
+      "discord": ["see_no_evil"],
+      "unicode": ["see_no_evil_monkey"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🙉",
+    "platforms": {
+      "github": ["hear_no_evil", "monkey"],
+      "slack": ["hear_no_evil"],
+      "discord": ["hear_no_evil"],
+      "unicode": ["hear_no_evil_monkey"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🙊",
+    "platforms": {
+      "github": ["speak_no_evil", "monkey"],
+      "slack": ["speak_no_evil"],
+      "discord": ["speak_no_evil"],
+      "unicode": ["speak_no_evil_monkey"]
+    },
+    "category": "Animals & Nature",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🍎",
+    "platforms": {
+      "github": ["apple", "fruit"],
+      "slack": ["apple"],
+      "discord": ["apple"],
+      "unicode": ["red_apple"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍊",
+    "platforms": {
+      "github": ["orange", "fruit"],
+      "slack": ["tangerine"],
+      "discord": ["tangerine"],
+      "unicode": ["tangerine"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍋",
+    "platforms": {
+      "github": ["lemon", "fruit"],
+      "slack": ["lemon"],
+      "discord": ["lemon"],
+      "unicode": ["lemon"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍌",
+    "platforms": {
+      "github": ["banana", "fruit"],
+      "slack": ["banana"],
+      "discord": ["banana"],
+      "unicode": ["banana"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍉",
+    "platforms": {
+      "github": ["watermelon", "fruit"],
+      "slack": ["watermelon"],
+      "discord": ["watermelon"],
+      "unicode": ["watermelon"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍇",
+    "platforms": {
+      "github": ["grapes", "fruit"],
+      "slack": ["grapes"],
+      "discord": ["grapes"],
+      "unicode": ["grapes"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍓",
+    "platforms": {
+      "github": ["strawberry", "fruit"],
+      "slack": ["strawberry"],
+      "discord": ["strawberry"],
+      "unicode": ["strawberry"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥝",
+    "platforms": {
+      "github": ["kiwi", "fruit"],
+      "slack": ["kiwifruit"],
+      "discord": ["kiwi"],
+      "unicode": ["kiwi_fruit"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍑",
+    "platforms": {
+      "github": ["peach", "fruit"],
+      "slack": ["peach"],
+      "discord": ["peach"],
+      "unicode": ["peach"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍒",
+    "platforms": {
+      "github": ["cherries", "fruit"],
+      "slack": ["cherries"],
+      "discord": ["cherries"],
+      "unicode": ["cherries"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥭",
+    "platforms": {
+      "github": ["mango", "fruit"],
+      "slack": ["mango"],
+      "discord": ["mango"],
+      "unicode": ["mango"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍍",
+    "platforms": {
+      "github": ["pineapple", "fruit"],
+      "slack": ["pineapple"],
+      "discord": ["pineapple"],
+      "unicode": ["pineapple"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥥",
+    "platforms": {
+      "github": ["coconut", "fruit"],
+      "slack": ["coconut"],
+      "discord": ["coconut"],
+      "unicode": ["coconut"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥑",
+    "platforms": {
+      "github": ["avocado", "fruit"],
+      "slack": ["avocado"],
+      "discord": ["avocado"],
+      "unicode": ["avocado"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥕",
+    "platforms": {
+      "github": ["carrot", "vegetable"],
+      "slack": ["carrot"],
+      "discord": ["carrot"],
+      "unicode": ["carrot"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🌽",
+    "platforms": {
+      "github": ["corn", "vegetable"],
+      "slack": ["corn"],
+      "discord": ["corn"],
+      "unicode": ["ear_of_corn"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥔",
+    "platforms": {
+      "github": ["potato", "vegetable"],
+      "slack": ["potato"],
+      "discord": ["potato"],
+      "unicode": ["potato"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍠",
+    "platforms": {
+      "github": ["sweet_potato", "vegetable"],
+      "slack": ["sweet_potato"],
+      "discord": ["sweet_potato"],
+      "unicode": ["roasted_sweet_potato"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🥖",
+    "platforms": {
+      "github": ["baguette", "bread"],
+      "slack": ["baguette_bread"],
+      "discord": ["baguette_bread"],
+      "unicode": ["baguette_bread"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🥨",
+    "platforms": {
+      "github": ["pretzel", "bread"],
+      "slack": ["pretzel"],
+      "discord": ["pretzel"],
+      "unicode": ["pretzel"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥯",
+    "platforms": {
+      "github": ["bagel", "bread"],
+      "slack": ["bagel"],
+      "discord": ["bagel"],
+      "unicode": ["bagel"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🧀",
+    "platforms": {
+      "github": ["cheese", "food"],
+      "slack": ["cheese_wedge"],
+      "discord": ["cheese"],
+      "unicode": ["cheese_wedge"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍖",
+    "platforms": {
+      "github": ["meat", "food"],
+      "slack": ["meat_on_bone"],
+      "discord": ["meat_on_bone"],
+      "unicode": ["meat_on_bone"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍗",
+    "platforms": {
+      "github": ["chicken", "food"],
+      "slack": ["poultry_leg"],
+      "discord": ["poultry_leg"],
+      "unicode": ["poultry_leg"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥩",
+    "platforms": {
+      "github": ["steak", "meat"],
+      "slack": ["cut_of_meat"],
+      "discord": ["cut_of_meat"],
+      "unicode": ["cut_of_meat"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥓",
+    "platforms": {
+      "github": ["bacon", "meat"],
+      "slack": ["bacon"],
+      "discord": ["bacon"],
+      "unicode": ["bacon"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍔",
+    "platforms": {
+      "github": ["hamburger", "burger"],
+      "slack": ["hamburger"],
+      "discord": ["hamburger"],
+      "unicode": ["hamburger"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍟",
+    "platforms": {
+      "github": ["fries", "french_fries"],
+      "slack": ["french_fries"],
+      "discord": ["fries"],
+      "unicode": ["french_fries"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍕",
+    "platforms": {
+      "github": ["pizza", "food"],
+      "slack": ["pizza"],
+      "discord": ["pizza"],
+      "unicode": ["pizza"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🌭",
+    "platforms": {
+      "github": ["hotdog", "food"],
+      "slack": ["hot_dog"],
+      "discord": ["hotdog"],
+      "unicode": ["hot_dog"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥪",
+    "platforms": {
+      "github": ["sandwich", "food"],
+      "slack": ["sandwich"],
+      "discord": ["sandwich"],
+      "unicode": ["sandwich"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🌮",
+    "platforms": {
+      "github": ["taco", "food"],
+      "slack": ["taco"],
+      "discord": ["taco"],
+      "unicode": ["taco"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🌯",
+    "platforms": {
+      "github": ["burrito", "food"],
+      "slack": ["burrito"],
+      "discord": ["burrito"],
+      "unicode": ["burrito"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥗",
+    "platforms": {
+      "github": ["salad", "food"],
+      "slack": ["green_salad"],
+      "discord": ["salad"],
+      "unicode": ["green_salad"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍝",
+    "platforms": {
+      "github": ["pasta", "food"],
+      "slack": ["spaghetti"],
+      "discord": ["spaghetti"],
+      "unicode": ["spaghetti"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍜",
+    "platforms": {
+      "github": ["ramen", "noodle"],
+      "slack": ["ramen"],
+      "discord": ["ramen"],
+      "unicode": ["steaming_bowl"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍲",
+    "platforms": {
+      "github": ["stew", "soup"],
+      "slack": ["stew"],
+      "discord": ["stew"],
+      "unicode": ["pot_of_food"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍥",
+    "platforms": {
+      "github": ["fish_cake", "food"],
+      "slack": ["fish_cake_with_swirl"],
+      "discord": ["fish_cake"],
+      "unicode": ["fish_cake_with_swirl"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🥮",
+    "platforms": {
+      "github": ["moon_cake", "food"],
+      "slack": ["moon_cake"],
+      "discord": ["moon_cake"],
+      "unicode": ["moon_cake"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🍱",
+    "platforms": {
+      "github": ["bento", "food"],
+      "slack": ["bento_box"],
+      "discord": ["bento"],
+      "unicode": ["bento_box"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍛",
+    "platforms": {
+      "github": ["curry", "food"],
+      "slack": ["curry_rice"],
+      "discord": ["curry"],
+      "unicode": ["curry_rice"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍣",
+    "platforms": {
+      "github": ["sushi", "food"],
+      "slack": ["sushi"],
+      "discord": ["sushi"],
+      "unicode": ["sushi"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍱",
+    "platforms": {
+      "github": ["bento", "food"],
+      "slack": ["bento_box"],
+      "discord": ["bento"],
+      "unicode": ["bento_box"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥡",
+    "platforms": {
+      "github": ["takeout", "food"],
+      "slack": ["takeout_box"],
+      "discord": ["takeout_box"],
+      "unicode": ["takeout_box"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🍨",
+    "platforms": {
+      "github": ["icecream", "dessert"],
+      "slack": ["ice_cream"],
+      "discord": ["ice_cream"],
+      "unicode": ["ice_cream"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍦",
+    "platforms": {
+      "github": ["ice_cream", "dessert"],
+      "slack": ["soft_ice_cream"],
+      "discord": ["soft_ice_cream"],
+      "unicode": ["soft_ice_cream"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍧",
+    "platforms": {
+      "github": ["shaved_ice", "dessert"],
+      "slack": ["shaved_ice"],
+      "discord": ["shaved_ice"],
+      "unicode": ["shaved_ice"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🧁",
+    "platforms": {
+      "github": ["cupcake", "dessert"],
+      "slack": ["cupcake"],
+      "discord": ["cupcake"],
+      "unicode": ["cupcake"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍰",
+    "platforms": {
+      "github": ["cake", "dessert"],
+      "slack": ["shortcake"],
+      "discord": ["cake"],
+      "unicode": ["shortcake"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🎂",
+    "platforms": {
+      "github": ["birthday", "cake"],
+      "slack": ["birthday"],
+      "discord": ["birthday"],
+      "unicode": ["birthday_cake"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍮",
+    "platforms": {
+      "github": ["custard", "dessert"],
+      "slack": ["custard"],
+      "discord": ["custard"],
+      "unicode": ["custard"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍭",
+    "platforms": {
+      "github": ["lollipop", "candy"],
+      "slack": ["lollipop"],
+      "discord": ["lollipop"],
+      "unicode": ["lollipop"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍬",
+    "platforms": {
+      "github": ["candy", "sweet"],
+      "slack": ["candy"],
+      "discord": ["candy"],
+      "unicode": ["candy"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍫",
+    "platforms": {
+      "github": ["chocolate", "sweet"],
+      "slack": ["chocolate_bar"],
+      "discord": ["chocolate_bar"],
+      "unicode": ["chocolate_bar"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍿",
+    "platforms": {
+      "github": ["popcorn", "snack"],
+      "slack": ["popcorn"],
+      "discord": ["popcorn"],
+      "unicode": ["popcorn"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍩",
+    "platforms": {
+      "github": ["doughnut", "dessert"],
+      "slack": ["doughnut"],
+      "discord": ["doughnut"],
+      "unicode": ["doughnut"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🍪",
+    "platforms": {
+      "github": ["cookie", "dessert"],
+      "slack": ["cookie"],
+      "discord": ["cookie"],
+      "unicode": ["cookie"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  },
+  {
+    "emoji": "🥠",
+    "platforms": {
+      "github": ["fortune_cookie", "dessert"],
+      "slack": ["fortune_cookie"],
+      "discord": ["fortune_cookie"],
+      "unicode": ["fortune_cookie"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 2
+  },
+  {
+    "emoji": "🥧",
+    "platforms": {
+      "github": ["pie", "dessert"],
+      "slack": ["pie"],
+      "discord": ["pie"],
+      "unicode": ["pie"]
+    },
+    "category": "Food & Drink",
+    "difficulty": 1
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "name": "quick-emoji",
+  "version": "1.0.0",
+  "private": true,
+  "description": "絵文字早押しクイズゲーム",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/web",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "build": "npm run build --workspace=apps/web",
+    "start": "npm run start --workspace=apps/web",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:api": "npm run deploy --workspace=apps/api",
+    "import-data": "node scripts/import-data.js",
+    "test": "npm run test --workspace=apps/web && npm run test --workspace=apps/api",
+    "test:watch": "npm run test:watch --workspace=apps/web",
+    "test:api": "npm run test --workspace=apps/api",
+    "test:e2e": "playwright test",
+    "type-check": "npm run type-check --workspace=apps/web && npm run type-check --workspace=apps/api",
+    "lint": "npm run lint --workspace=apps/web",
+    "lint:fix": "npm run lint:fix --workspace=apps/web"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
