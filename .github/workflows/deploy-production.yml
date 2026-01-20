@@ -31,9 +31,24 @@ jobs:
       - name: Deploy API to production
         id: deploy-api
         run: |
-          cd apps/api
+          set -e
+          echo "Current directory: $(pwd)"
+          echo "Listing apps directory:"
+          ls -la apps/ || echo "apps directory not found"
+          echo "Changing to apps/api directory..."
+          cd apps/api || { echo "Failed to cd to apps/api"; exit 1; }
+          echo "Current directory after cd: $(pwd)"
+          echo "Listing api directory:"
+          ls -la
+          echo "Checking package.json..."
+          cat package.json | grep -A 5 '"scripts"'
+          echo "Running npm run deploy..."
           # Use wrangler from node_modules instead of global to ensure correct version
-          DEPLOY_OUTPUT=$(npm run deploy 2>&1)
+          DEPLOY_OUTPUT=$(npm run deploy 2>&1) || {
+            echo "Deploy failed with exit code: $?"
+            echo "Deploy output: $DEPLOY_OUTPUT"
+            exit 1
+          }
           echo "$DEPLOY_OUTPUT"
           # Extract URL from deploy output: https://quick-emoji-api.{subdomain}.workers.dev
           API_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.workers\.dev' | head -1 || echo "https://quick-emoji-api.${CLOUDFLARE_ACCOUNT_ID}.workers.dev")
