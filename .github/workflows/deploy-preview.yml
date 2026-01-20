@@ -32,10 +32,23 @@ jobs:
       - name: Deploy API to preview environment
         id: deploy-api
         run: |
+          set -e
           # Deploy to preview environment with PR number suffix
+          echo "Deploying to preview environment: preview-${{ github.event.number }}"
           cd apps/api
+          echo "Current directory: $(pwd)"
+          echo "Verifying environment variables..."
+          echo "CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:0:8}..."
+          echo "EMOJI_DATA_ID: ${EMOJI_DATA_ID}"
+          echo "GAME_SESSIONS_ID: ${GAME_SESSIONS_ID}"
+          echo "LEADERBOARD_ID: ${LEADERBOARD_ID}"
+          echo "PR_NUMBER: ${PR_NUMBER}"
           # Use wrangler from node_modules instead of global to ensure correct version
-          DEPLOY_OUTPUT=$(npx wrangler deploy --env preview-${{ github.event.number }} 2>&1)
+          DEPLOY_OUTPUT=$(npx wrangler deploy --env preview-${{ github.event.number }} 2>&1) || {
+            echo "Deploy failed with exit code: $?"
+            echo "Deploy output: $DEPLOY_OUTPUT"
+            exit 1
+          }
           echo "$DEPLOY_OUTPUT"
           # Extract URL from deploy output
           API_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.workers\.dev' | head -1 || echo "https://quick-emoji-api-preview-${PR_NUMBER}.${CLOUDFLARE_ACCOUNT_ID}.workers.dev")
