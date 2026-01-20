@@ -42,9 +42,14 @@ jobs:
           ls -la
           echo "Checking package.json..."
           cat package.json | grep -A 5 '"scripts"'
-          echo "Running npm run deploy..."
+          echo "Running wrangler deploy..."
+          echo "CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:0:8}..."
+          echo "EMOJI_DATA_ID: ${EMOJI_DATA_ID}"
+          echo "GAME_SESSIONS_ID: ${GAME_SESSIONS_ID}"
+          echo "LEADERBOARD_ID: ${LEADERBOARD_ID}"
           # Use wrangler from node_modules instead of global to ensure correct version
-          DEPLOY_OUTPUT=$(npm run deploy 2>&1) || {
+          # Use --env="" to explicitly target the top-level environment
+          DEPLOY_OUTPUT=$(npx wrangler deploy --env="" 2>&1) || {
             echo "Deploy failed with exit code: $?"
             echo "Deploy output: $DEPLOY_OUTPUT"
             exit 1
