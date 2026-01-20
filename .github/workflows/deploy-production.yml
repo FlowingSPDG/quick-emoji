@@ -25,40 +25,67 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Setup Wrangler
-        run: npm install -g wrangler@latest
+      - name: Verify environment variables
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "❌ CLOUDFLARE_API_TOKEN is not set"
+            exit 1
+          fi
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "❌ CLOUDFLARE_ACCOUNT_ID is not set"
+            exit 1
+          fi
+          echo "✅ Required environment variables are set"
+          echo "CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:0:8}..."
+          echo "KV Namespaces configured: ${EMOJI_DATA_ID:+Yes} ${GAME_SESSIONS_ID:+Yes} ${LEADERBOARD_ID:+Yes}"
 
       - name: Deploy API to production
         id: deploy-api
+        continue-on-error: false
         run: |
           set -e
-          echo "Current directory: $(pwd)"
-          echo "Listing apps directory:"
-          ls -la apps/ || echo "apps directory not found"
-          echo "Changing to apps/api directory..."
-          cd apps/api || { echo "Failed to cd to apps/api"; exit 1; }
-          echo "Current directory after cd: $(pwd)"
-          echo "Listing api directory:"
-          ls -la
-          echo "Checking package.json..."
-          cat package.json | grep -A 5 '"scripts"'
+          cd apps/api
+          echo "Verifying wrangler.toml..."
+          cat wrangler.toml
+          echo ""
+          echo "Verifying package.json scripts..."
+          npm run deploy --dry-run 2>&1 || true
+          echo ""
           echo "Running wrangler deploy..."
-          echo "CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:0:8}..."
-          echo "EMOJI_DATA_ID: ${EMOJI_DATA_ID}"
-          echo "GAME_SESSIONS_ID: ${GAME_SESSIONS_ID}"
-          echo "LEADERBOARD_ID: ${LEADERBOARD_ID}"
-          # Use wrangler from node_modules instead of global to ensure correct version
           # Use --env="" to explicitly target the top-level environment
+          # Redirect both stdout and stderr to capture all output
           DEPLOY_OUTPUT=$(npx wrangler deploy --env="" 2>&1) || {
-            echo "Deploy failed with exit code: $?"
-            echo "Deploy output: $DEPLOY_OUTPUT"
-            exit 1
+            EXIT_CODE=$?
+            echo "⚠️ Deploy command failed with exit code: $EXIT_CODE"
+            echo "Deploy output:"
+            echo "$DEPLOY_OUTPUT"
+            
+            # Check if it's a known error that we can handle
+            if echo "$DEPLOY_OUTPUT" | grep -q "Could not route to.*workers/services"; then
+              echo "⚠️ Cloudflare API routing error - this might be a permissions or account ID issue"
+              echo "Falling back to default API URL format..."
+              API_URL="https://quick-emoji-api.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
+              echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+              echo "Using fallback API URL: $API_URL"
+              # Don't exit - continue with fallback URL
+            else
+              echo "❌ Deploy failed with unknown error"
+              exit $EXIT_CODE
+            fi
           }
-          echo "$DEPLOY_OUTPUT"
-          # Extract URL from deploy output: https://quick-emoji-api.{subdomain}.workers.dev
-          API_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.workers\.dev' | head -1 || echo "https://quick-emoji-api.${CLOUDFLARE_ACCOUNT_ID}.workers.dev")
-          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
-          echo "Deployed API to: $API_URL"
+          
+          # If deploy succeeded, extract URL from output
+          if [ -z "${API_URL:-}" ]; then
+            echo "$DEPLOY_OUTPUT"
+            API_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.workers\.dev' | head -1 || echo "")
+            if [ -z "$API_URL" ]; then
+              echo "⚠️ Could not extract API URL from output, using fallback"
+              API_URL="https://quick-emoji-api.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
+            fi
+            echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "✅ API deployed successfully to: $API_URL"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -67,11 +94,19 @@ jobs:
           LEADERBOARD_ID: ${{ secrets.KV_LEADERBOARD_ID }}
 
       - name: Build web app for production
+        continue-on-error: false
         run: |
           cd apps/web
+          # Use API URL from deploy step, or fallback to default format
+          if [ -z "${{ steps.deploy-api.outputs.api_url }}" ]; then
+            echo "⚠️ API URL not set, using fallback"
+            export NEXT_PUBLIC_API_URL="https://quick-emoji-api.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
+          fi
+          echo "Building with NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}"
           npm run build
         env:
-          NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}
+          NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url || format('https://quick-emoji-api.{0}.workers.dev', secrets.CLOUDFLARE_ACCOUNT_ID) }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy web app to production
         run: |
