@@ -166,7 +166,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/web/out --project-name=quick-emoji --branch=pr-${{ github.event.number }}
+          command: pages deploy apps/web/out --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }} --branch=pr-${{ github.event.number }}
 
       - name: Comment on PR
         uses: actions/github-script@v7
@@ -174,7 +174,7 @@ jobs:
           script: |
             const apiUrl = '${{ steps.deploy-api.outputs.url }}';
             const deployWebUrl = '${{ steps.deploy-web.outputs.url }}';
-            const webUrl = deployWebUrl || 'https://quick-emoji.pages.dev';
+            const webUrl = deployWebUrl || 'https://${{ secrets.CLOUDFLARE_PROJECT_NAME }}.pages.dev';
             
             const body = `## 🚀 Preview Deployment
             
@@ -437,14 +437,14 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/web/out --project-name=quick-emoji
+          command: pages deploy apps/web/out --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }}
 
       - name: Create deployment notification
         uses: actions/github-script@v7
         with:
           script: |
             const apiUrl = '${{ steps.deploy-api.outputs.url }}';
-            const webUrl = '${{ steps.deploy-web.outputs.url }}' || 'https://quick-emoji.pages.dev';
+            const webUrl = '${{ steps.deploy-web.outputs.url }}' || 'https://${{ secrets.CLOUDFLARE_PROJECT_NAME }}.pages.dev';
             
             const body = `## 🚀 Production Deployment Complete
             
