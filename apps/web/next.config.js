@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
 
   // Cloudflare Pages対応
-  output: 'standalone',
+  output: 'export',
 
   images: {
     unoptimized: true,
@@ -26,10 +26,10 @@ const nextConfig = {
   },
 
   // 実験的機能（必要に応じて有効化）
-  experimental: {
-    // App Routerの最適化
-    optimizeCss: true,
-  },
+  // optimizeCss requires critters package which is not installed
+  // experimental: {
+  //   optimizeCss: true,
+  // },
 
   // コンパイラ設定
   compiler: {

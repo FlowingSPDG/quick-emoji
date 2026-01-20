@@ -1,38 +1,184 @@
-# Quick Emoji
+# 🎯 Quick Emoji - 絵文字早押しクイズゲーム
 
-絵文字を見て瞬時にそのshortcodeを入力する早押しクイズゲームです。GitHub、Slack、Discord、Unicodeのshortcodeに対応しており、難易度を選んでプレイできます。回答時間と難易度に応じてスコアが計算され、グローバルリーダーボードで他のプレイヤーと競い合えます。
+絵文字を見て瞬時にそのshortcode（略称）を入力する早押しクイズゲームです！
 
-## システム概要
+## ✨ 特徴
 
-フロントエンドとバックエンドが分離された構成です。フロントエンドはNext.jsで構築され、ゲーム画面やリーダーボードを表示します。バックエンドはCloudflare Workers上で動作するAPIサーバーで、ゲームセッション管理、回答判定、スコア計算、リーダーボード管理を担当します。データはCloudflare KVに保存され、絵文字データ、ゲームセッション、リーダーボード情報が格納されます。
+- **複数プラットフォーム対応**: GitHub, Slack, Discord, Unicodeのshortcodeに対応
+- **難易度調整**: イージー、ミディアム、ハードの3段階
+- **リアルタイム判定**: 即時フィードバックで学習効果が高い
+- **スコアリングシステム**: 時間ボーナスと難易度ボーナス
+- **グローバルリーダーボード**: 世界中のプレイヤーと競争
+- **Cloudflare対応**: Pages + Workers + KVで高速・スケーラブル
 
-## インフラ構成
+## 🚀 技術スタック
 
-フロントエンドはCloudflare Pagesにデプロイされます。バックエンドAPIはCloudflare Workersとして動作し、エッジコンピューティングにより低レイテンシで応答します。データストアにはCloudflare KVを使用し、絵文字データ、ゲームセッション、リーダーボードの3つのKVネームスペースで管理しています。プレビュー環境はGitHub Actionsのワークフローで自動的に構築され、プルリクエストごとにプレビュー用のWorkers環境が作成されます。
+**Frontend**: Next.js 15 (App Router), React 18, TypeScript
+**Backend**: Hono (Cloudflare Workers), TypeScript
+**Database**: Cloudflare KV
+**Testing**: Jest, Vitest, Playwright
+**CI/CD**: GitHub Actions
+**Deployment**: Cloudflare Pages + Workers
 
-## 技術スタック
+## 🛠️ セットアップ
 
-### フロントエンド
-- Next.js 15.0.0 (App Router)
-- React 18.3.1
-- TypeScript 5.3.3
+### 必要条件
+- Node.js 18+
+- npm
+- Cloudflare アカウント
 
-### バックエンド
-- Hono 4.0.0
-- Cloudflare Workers
-- TypeScript 5.3.3
+### インストール
+```bash
+git clone <repository-url>
+cd quick-emoji
+npm install
+npm run import-data
+```
 
-### データストア
-- Cloudflare KV
+### 開発サーバー起動
+```bash
+npm run dev          # Frontend (http://localhost:3000)
+npm run dev:api      # API (http://localhost:8787)
+```
 
-### デプロイ
-- Cloudflare Pages (フロントエンド)
-- Cloudflare Workers (バックエンド)
+### テスト実行
+```bash
+npm test             # 全テスト
+npm run test:watch   # Frontendテスト (Watch)
+npm run test:api     # APIテスト
+npm run test:e2e     # E2Eテスト
+npm run type-check   # 型チェック
+npm run lint         # リンティング
+```
 
-### 開発環境
-- npm workspaces
-- Wrangler 3.19.0
+## 🎮 ゲームルール
 
-## ライセンス
+1. **設定**: プラットフォーム、難易度、問題数、制限時間を選択
+2. **ゲーム開始**: 絵文字が表示される
+3. **回答**: 絵文字のshortcodeを素早く入力（例: `:smile:`）
+4. **判定**: 正誤が即座に表示
+5. **スコア**: 時間ボーナス + 難易度ボーナスで計算
+6. **結果**: 最終スコアと統計、リーダーボード順位を表示
+
+**スコア計算式**: `基本スコア(10) + 時間ボーナス + 難易度ボーナス`
+
+## 📊 API エンドポイント
+
+### 絵文字関連
+- `GET /api/emojis` - 絵文字一覧取得（フィルタリング対応）
+
+### セッション関連
+- `POST /api/session/start` - ゲームセッション開始
+- `POST /api/session/answer` - 回答送信・判定
+- `POST /api/session/end` - セッション終了・スコア計算
+
+### リーダーボード関連
+- `GET /api/leaderboard` - リーダーボード取得
+
+## 🚀 デプロイ
+
+### Cloudflareへのデプロイ
+```bash
+npm run deploy
+```
+
+### 環境変数の設定
+
+`NEXT_PUBLIC_API_URL`は、デプロイされたCloudflare Workers APIのURLを指定します。
+
+**自動設定（推奨）**:
+- GitHub Actionsのワークフローで自動的に設定されます
+- APIをデプロイした後、そのURLが自動的に取得され、Webアプリのビルド時に使用されます
+
+**手動設定が必要な場合**:
+Cloudflare Pagesダッシュボードで設定：
+```
+NEXT_PUBLIC_API_URL=https://quick-emoji-api.{your-account-subdomain}.workers.dev
+```
+
+**ローカル開発時**:
+- デフォルトで `http://localhost:8787` が使用されます
+- ローカルでAPIを起動する場合: `npm run dev:api`
+
+## 🔒 セキュリティ
+
+- **レート制限**: IPベースおよびセッションベースのレート制限
+- **入力バリデーション**: すべてのユーザー入力の検証
+- **CORS設定**: 許可されたオリジンのみアクセス可能
+- **エラーハンドリング**: 詳細なエラーログとユーザーフレンドリーなメッセージ
+
+## 🤝 貢献
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Add tests (`npm test`)
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## 📝 開発フロー
+
+### ブランチ戦略
+- `main`: 本番環境
+- `develop`: 開発環境
+- `feature/*`: 新機能開発
+- `hotfix/*`: 緊急修正
+
+### コミットメッセージ
+```
+feat: 新機能の追加
+fix: バグ修正
+docs: ドキュメント更新
+style: スタイル修正
+refactor: リファクタリング
+test: テスト追加
+chore: その他の変更
+```
+
+## 📈 テストカバレッジ
+
+### Frontendテスト
+- コンポーネントテスト (Jest + React Testing Library)
+- ユーティリティ関数テスト
+- APIクライアントテスト
+
+### Backendテスト
+- スコアリングロジックテスト (Vitest)
+- バリデーションテスト
+- APIレスポンステスト
+
+### E2Eテスト
+- ゲームフロー全体テスト (Playwright)
+- ナビゲーションテスト
+- フォームバリデーションテスト
+
+## 📋 プロジェクト構造
+
+```
+quick-emoji/
+├── apps/
+│   ├── web/                    # Next.js フロントエンド
+│   │   ├── app/               # App Router pages
+│   │   ├── components/        # React components
+│   │   ├── lib/               # Utilities & API client
+│   │   └── __tests__/         # Unit tests
+│   └── api/                   # Hono API (Workers)
+│       ├── src/
+│       │   ├── routes/        # API route handlers
+│       │   ├── lib/          # Utilities & helpers
+│       │   └── __tests__/    # Unit tests
+├── e2e/                       # E2E tests
+├── scripts/                   # Deployment & utility scripts
+├── data/                     # Emoji data
+├── .github/workflows/        # CI/CD pipelines
+└── package.json              # Workspace config
+```
+
+## 📄 ライセンス
 
 MIT License
+
+---
+
+**楽しんでプレイしてください！ 🎉**

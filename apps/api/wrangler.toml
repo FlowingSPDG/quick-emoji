@@ -9,10 +9,6 @@ kv_namespaces = [
   { binding = "LEADERBOARD", id = "${LEADERBOARD_ID}" }
 ]
 
-# CORS configuration
-[build]
-command = "npm run build"
-
 # Environment variables (if needed)
 [vars]
 NODE_ENV = "production"

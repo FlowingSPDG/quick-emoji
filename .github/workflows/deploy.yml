@@ -1,0 +1,64 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+    - name: Deploy API to Cloudflare Workers
+      id: deploy-api
+      run: |
+        cd apps/api
+        DEPLOY_OUTPUT=$(npm run deploy 2>&1)
+        echo "$DEPLOY_OUTPUT"
+        # Extract URL from deploy output: https://quick-emoji-api.{subdomain}.workers.dev
+        API_URL=$(echo "$DEPLOY_OUTPUT" | grep -o 'https://[^[:space:]]*\.workers\.dev' | head -1 || echo "https://quick-emoji-api.${CLOUDFLARE_ACCOUNT_ID}.workers.dev")
+        echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+        echo "Deployed API to: $API_URL"
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        EMOJI_DATA_ID: ${{ secrets.KV_EMOJI_DATA_ID }}
+        GAME_SESSIONS_ID: ${{ secrets.KV_GAME_SESSIONS_ID }}
+        LEADERBOARD_ID: ${{ secrets.KV_LEADERBOARD_ID }}
+
+    - name: Build web app
+      run: npm run build
+      env:
+        NEXT_PUBLIC_API_URL: ${{ steps.deploy-api.outputs.api_url }}
+
+    - name: Deploy to Cloudflare Pages
+      uses: cloudflare/pages-action@v1
+      with:
+        apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+        directory: apps/web/out
+        gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Import emoji data
+      run: |
+        npm run import-data
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

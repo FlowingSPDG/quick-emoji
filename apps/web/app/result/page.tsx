@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { handleApiError } from '../../lib/api';
@@ -14,7 +14,7 @@ interface ResultData {
   leaderboardRank: number | null;
 }
 
-export default function ResultPage() {
+function ResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('sessionId');
@@ -156,5 +156,13 @@ export default function ResultPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function ResultPage() {
+  return (
+    <Suspense fallback={<Loading message="結果を読み込み中..." size="large" />}>
+      <ResultContent />
+    </Suspense>
   );
 }
