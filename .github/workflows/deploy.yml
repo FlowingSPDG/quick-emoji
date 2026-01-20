@@ -166,7 +166,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/web/out --project-name=quick-emoji --branch=pr-${{ github.event.number }} --compatibility-date=2024-01-20
+          command: pages deploy apps/web/out --project-name=quick-emoji --branch=pr-${{ github.event.number }}
 
       - name: Comment on PR
         uses: actions/github-script@v7
@@ -437,7 +437,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/web/out --project-name=quick-emoji --compatibility-date=2024-01-20
+          command: pages deploy apps/web/out --project-name=quick-emoji
 
       - name: Create deployment notification
         uses: actions/github-script@v7
