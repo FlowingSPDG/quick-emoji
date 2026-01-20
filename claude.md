@@ -115,7 +115,6 @@ score = BASE_SCORE (10) + (remainingTime * 0.5) + (difficulty * 5)
 ### テスト
 - フロントエンド: Jest + React Testing Library
 - バックエンド: Vitest
-- E2E: Playwright
 
 ### デプロイ
 - プレビュー環境: GitHub Actions で自動デプロイ（PRごと）

@@ -13,15 +13,6 @@ kv_namespaces = [
 [vars]
 NODE_ENV = "production"
 
-# Preview environment configuration (used for PR deployments)
-[env.preview]
-name = "quick-emoji-api-preview-${PR_NUMBER}"
-# Preview environments use the same KV namespaces as production
-kv_namespaces = [
-  { binding = "EMOJI_DATA", id = "${EMOJI_DATA_ID}" },
-  { binding = "GAME_SESSIONS", id = "${GAME_SESSIONS_ID}" },
-  { binding = "LEADERBOARD", id = "${LEADERBOARD_ID}" }
-]
-
-[env.preview.vars]
-NODE_ENV = "preview"
+# Preview environments are deployed with --name flag to create unique service names
+# Example: wrangler deploy --name quick-emoji-api-preview-1
+# This avoids the need for dynamic environment sections in wrangler.toml
