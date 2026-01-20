@@ -117,7 +117,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/web/out --project-name=quick-emoji-preview-${{ github.event.number }}
+          command: pages deploy apps/web/out --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }}
 
       # Comment on PR with deployment URLs
       - name: Comment on PR
@@ -125,7 +125,7 @@ jobs:
         with:
           script: |
             const workerUrl = '${{ steps.deploy-api.outputs.api_url }}';
-            const pagesUrl = 'https://quick-emoji-preview-${{ github.event.number }}.pages.dev';
+            const pagesUrl = 'https://${{ secrets.CLOUDFLARE_PROJECT_NAME }}.pages.dev';
             
             const body = `## 🚀 Preview Deployment
             
