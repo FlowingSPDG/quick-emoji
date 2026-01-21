@@ -4,10 +4,19 @@ compatibility_date = "2024-01-20"
 
 # KV Namespaces - IDs are provided via environment variables from GitHub Secrets
 kv_namespaces = [
-  { binding = "EMOJI_DATA", id = "${EMOJI_DATA_ID}" },
-  { binding = "GAME_SESSIONS", id = "${GAME_SESSIONS_ID}" },
-  { binding = "LEADERBOARD", id = "${LEADERBOARD_ID}" }
+  { binding = "EMOJI_DATA", id = "${EMOJI_DATA_ID}" }
 ]
+
+# Durable Objects
+[[durable_objects.bindings]]
+name = "GAME_ROOM"
+class_name = "GameRoom"
+script_name = "quick-emoji-api"
+
+# Durable Objects migrations (for deployment)
+[[migrations]]
+tag = "v1"
+new_classes = ["GameRoom"]
 
 # Environment variables (if needed)
 [vars]

@@ -5,11 +5,10 @@ import { globalRateLimit } from './lib/rate-limit';
 
 // Routes
 import emojisRoute from './routes/emojis';
-import sessionRoute from './routes/session';
-import leaderboardRoute from './routes/leaderboard';
 
 // Types
 import type { HonoType } from './types';
+import { GameRoom } from './durable-objects/GameRoom';
 
 const app = new Hono<HonoType>();
 
@@ -28,8 +27,19 @@ app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOStri
 
 // API routes
 app.route('/api/emojis', emojisRoute);
-app.route('/api/session', sessionRoute);
-app.route('/api/leaderboard', leaderboardRoute);
+
+// WebSocket endpoint
+app.get('/ws/:roomCode?', async (c) => {
+  const roomCode = c.req.param('roomCode') || 'temp';
+
+  // Get or create DurableObject instance for the room
+  // For new rooms, use a temporary ID and the room code will be generated inside GameRoom
+  const id = c.env.GAME_ROOM.idFromName(roomCode);
+  const stub = c.env.GAME_ROOM.get(id);
+
+  // Forward WebSocket upgrade request to DurableObject
+  return stub.fetch(c.req.raw);
+});
 
 // Error handling
 app.onError((err, c) => {
@@ -43,3 +53,4 @@ app.notFound((c) => {
 });
 
 export default app;
+export { GameRoom };

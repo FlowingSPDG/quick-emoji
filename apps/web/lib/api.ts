@@ -1,13 +1,6 @@
 import type {
   GetEmojisRequest,
   GetEmojisResponse,
-  StartSessionRequest,
-  StartSessionResponse,
-  AnswerRequest,
-  AnswerResponse,
-  EndSessionRequest,
-  EndSessionResponse,
-  LeaderboardResponse
 } from '@quick-emoji/shared';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
@@ -60,9 +53,6 @@ export const emojiApi = {
     if (params?.platforms) {
       searchParams.append('platforms', params.platforms.join(','));
     }
-    if (params?.difficulty) {
-      searchParams.append('difficulty', params.difficulty);
-    }
     if (params?.count) {
       searchParams.append('count', params.count.toString());
     }
@@ -72,52 +62,9 @@ export const emojiApi = {
   },
 };
 
-// Session API
-export const sessionApi = {
-  start: (request: StartSessionRequest): Promise<StartSessionResponse> => {
-    return apiRequest<StartSessionResponse>('/api/session/start', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
-  },
-
-  answer: (request: AnswerRequest): Promise<AnswerResponse> => {
-    return apiRequest<AnswerResponse>('/api/session/answer', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
-  },
-
-  end: (request: EndSessionRequest): Promise<EndSessionResponse> => {
-    return apiRequest<EndSessionResponse>('/api/session/end', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
-  },
-};
-
-// Leaderboard API
-export const leaderboardApi = {
-  getLeaderboard: (limit?: number, platform?: string): Promise<LeaderboardResponse> => {
-    const searchParams = new URLSearchParams();
-
-    if (limit) {
-      searchParams.append('limit', limit.toString());
-    }
-    if (platform) {
-      searchParams.append('platform', platform);
-    }
-
-    const query = searchParams.toString();
-    return apiRequest<LeaderboardResponse>(`/api/leaderboard${query ? `?${query}` : ''}`);
-  },
-};
-
 // Utility functions
 export const apiClient = {
   emoji: emojiApi,
-  session: sessionApi,
-  leaderboard: leaderboardApi,
 };
 
 // Error handling utilities
