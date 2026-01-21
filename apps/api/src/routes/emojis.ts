@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { getEmojis } from '../lib/kv';
 import { checkGlobalRateLimit } from '../lib/validation';
-import type { GetEmojisRequest, GetEmojisResponse, Platform, Difficulty } from '@quick-emoji/shared';
+import type { GetEmojisRequest, GetEmojisResponse, Platform } from '@quick-emoji/shared';
 import type { HonoType } from '../types';
 
 const app = new Hono<HonoType>();
@@ -20,16 +20,10 @@ app.get('/', async (c) => {
     const platforms: Platform[] | undefined = platformsParam?.filter((p): p is Platform => 
       ['github', 'slack', 'discord', 'unicode'].includes(p as Platform)
     );
-    const difficultyParam = c.req.query('difficulty');
-    const difficulty: Difficulty | undefined = difficultyParam && 
-      ['easy', 'medium', 'hard', 'all'].includes(difficultyParam) 
-      ? (difficultyParam as Difficulty) 
-      : undefined;
     const count = c.req.query('count') ? parseInt(c.req.query('count')!) : undefined;
 
     const request: GetEmojisRequest = {
       platforms,
-      difficulty,
       count
     };
 

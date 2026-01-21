@@ -1,10 +1,10 @@
 import type { Hono } from 'hono';
+import type { GameRoom } from './durable-objects/GameRoom';
 
 // Cloudflare Workers environment
 export interface Env {
   EMOJI_DATA: KVNamespace;
-  GAME_SESSIONS: KVNamespace;
-  LEADERBOARD: KVNamespace;
+  GAME_ROOM: DurableObjectNamespace<GameRoom>;
 }
 
 // Hono context with environment
